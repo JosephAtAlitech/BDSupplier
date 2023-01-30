@@ -19,6 +19,7 @@ $(document).ready(function() {
 });
 
 
+
 // Delete Expenses
 
 function deleteExpense(id){
@@ -38,14 +39,13 @@ function deleteExpense(id){
 					  $(this).hide(); n();
 					});
 					manageExpenseTypeTable.ajax.reload(null, false);
-
 				}
     		},error: function (xhr) {
 			alert(xhr.responseText);
     		}
     	});
 	}
-}
+ }
 		
 	
 		
@@ -60,6 +60,7 @@ function deleteExpense(id){
 		  var expenseDate = $("#expenseDate").val();
 		  var expenseCause = $("#expenseCause").val();
 		  var expenseType = $("#expenseType").val();
+		  alert(expenseType)
 		  var expenseBy = $("#expenseBy").val();
 		  var amount = $("#amount").val();
 		  var status = $("#status").val();
@@ -82,6 +83,7 @@ function deleteExpense(id){
 				processData: false,
 				dataType: 'json',
 				success: function(response){
+					alert(JSON.stringify(response))
 					if(response == "Success"){
 						$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
 					   $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
@@ -98,6 +100,7 @@ function deleteExpense(id){
 					
 					}
 				},error: function (xhr) {
+					alert(JSON.stringify(xhr))
 					alert(xhr.responseText);
 				}
 			  });

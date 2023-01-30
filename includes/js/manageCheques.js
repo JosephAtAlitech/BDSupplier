@@ -3,7 +3,7 @@ var manageExpenseTypeTable;
 
 // retrive Expense type data
 
-$(document).ready(function(){
+$(document).ready(function() {
 	manageExpenseTypeTable = $("#manageExpanseTypeTable").DataTable({
 		'ajax': 'phpScripts/manageExepnseType-add.php',
 		'order': [],
@@ -22,6 +22,7 @@ $(document).ready(function(){
 function deleteExpenseType(id){
 	var conMsg = confirm("Are you sure to delete??")
 	if(conMsg){
+		
 		var Id = id;
 		var fd = new FormData();
 		fd.append('Id',Id);
@@ -32,15 +33,15 @@ function deleteExpenseType(id){
 		data: fd,
 		contentType: false,
 		processData: false,
+		
     		success:function(response)
     		{
 				if(response == "Success"){
 					$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
-				   $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
+				    $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 					  $(this).hide(); n();
 					});
 					manageExpenseTypeTable.ajax.reload(null, false);
-
 				}
     		},error: function (xhr) {
 			alert(xhr.responseText);
@@ -49,22 +50,41 @@ function deleteExpenseType(id){
 	}
 }
 		
+
 	/*------------------ Start Save Expense Type & validation panel ---------------------- */
 		
+		
 		$(document).ready(function() {
-		$('#expenseTypeForm').bootstrapValidator({
+		$('#form_addCheque').bootstrapValidator({
 		live:'enabled',
 		message:'This value is not valid',
-		submitButton:'$expenseTypeForm button [type="Submit"]',
+		submitButton:'$form_addCheque button [type="Submit"]',
 		submitHandler: function(validator, form, submitButton){
 		
-		var name = $("#name").val();
-		
+		  var receivingDate = $("#receivingDate").val();
+          var paymentFrom = $("#paymentFrom").val();
+          var bankName = $("#bankName").val();
+          var brandName = $("#brandName").val();
+          var chequeType = $("#chequeType").val();
+          var payTo = $("#payTo").val();
+          var depositeAccount = $("#depositeAccount").val();
+          var chequeNo = $("#chequeNo").val();
+          var chequeDate = $("#chequeDate").val();
+          var amount = $("#amount").val();
 			
 		  var fd = new FormData();
-		  fd.append('saveExpenseType',"saveExpenseType");
-		  fd.append('name',name);
-
+		  fd.append('saveCheque',"saveCheque");
+		  fd.append('receivingDate',receivingDate);
+          fd.append('paymentFrom',paymentFrom);
+          fd.append('bankName',bankName);
+          fd.append('branchName',branchName);
+          fd.append('chequeType',chequeType);
+          fd.append('payTo',payTo);
+          fd.append('depositeAccount',depositeAccount);
+          fd.append('chequeNo',chequeNo);
+          fd.append('chequeDate',chequeDate);
+          fd.append('amount',amount);
+          
 		  $.ajax({
 				type: 'POST',
 				url: 'phpScripts/manageExepnseType-add.php',
@@ -117,14 +137,16 @@ function deleteExpenseType(id){
 		}); 
 		
 		
-		//Expense Type Form Update
+	    //Expense Type Form Update
 
 		$(document).ready(function() {
+
 		$('#expenseTypeFormUpdate').bootstrapValidator({
 		live:'enabled',
 		message:'This value is not valid',
 		submitButton:'#expenseTypeFormUpdate button [type="Submit"]',
 		submitHandler: function(validator, form, submitButton){
+
 		var expenseTypeId = $("#editExpenseTypeId").val();
 		var expenseTypeName = $("#editExpenseTypeName").val();
 		var expenseTypeStatus = $("#editExpenseTypeStatus").val();

@@ -156,7 +156,9 @@
                 <ul class="treeview-menu">
                     <li><a href="expenseType-view.php?id=0"><i class="fa fa-bars"></i> <span>Expense Type</span></a></li>
                     <li><a href="expenses-view.php?page=Expenses"><i class="fa fa-bars"></i> <span>Expenses</span></a></li>
-                     
+                    <li><a href="dailyReport-view.php"><i class="fa fa-file-pdf-o"></i> <span>Expense Report</span></a></li>
+                    <li><a href="gererateExpenseReport-view.php"><i class="fa fa-file-pdf-o"></i> <span> Gererate Expense Report</span></a></li>
+                
 				</ul>
             </li>
             <?php } ?>
@@ -221,6 +223,7 @@
                 <ul class="treeview-menu">
                     
                     <?php if(strtolower($_SESSION['userType']) == "admin coordinator" || strtolower($_SESSION['userType']) == "admin support" || strtolower($_SESSION['userType']) == "admin support plus" || strtolower($_SESSION['userType']) == 'super admin'){ ?>
+                       
                         <li><a href="dailyCashSalespdf-view.php"><i class="fa fa-file-pdf-o"></i> <span> Day Wise Cash ledger </span></a></li>
                         <li><a href="dailyCashSalesLedger-view.php"><i class="fa fa-file-pdf-o"></i> <span> Method Wise Received Balance</span></a></li>
                         <li><a href="dateWiseCash-view.php"><i class="fa fa-file-pdf-o"></i> <span> Date wise Received Balance </span></a></li>

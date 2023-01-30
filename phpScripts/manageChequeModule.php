@@ -23,9 +23,19 @@ if(isset($_GET['page'])){
         echo json_encode($row_expanseType);
      }
 } elseif(isset($_POST['saveExpenseType'])) {
-        
-        $ExpenseTypeName = $_POST['name'];
-		$created_date = date('Y-m-d H:i:s');
+
+ 
+        $receivingDate = $_POST['receivingDate'];
+        $paymentFrom = $_POST['paymentFrom'];
+        $bankName = $_POST['bankName'];
+        $branchName = $_POST['branchName'];
+        $chequeType = $_POST['chequeType'];
+        $payTo = $_POST['payTo'];
+        $depositeAccount = $_POST['depositeAccount'];
+        $chequeNo = $_POST['chequeNo'];
+        $chequeDate = $_POST['chequeDate'];
+        $amount = $_POST['amount'];
+	
         
         try{    
             $conn->begin_transaction();

@@ -2,7 +2,7 @@
     include 'includes/session.php'; 
     include 'includes/header.php'; 
     $sessionId = time().uniqid();
-	include '../timezone.php'; 
+	//include '../timezone.php'; 
 	$today = date('Y-m-d');
 	$year = date('Y');
 	if(isset($_GET['year'])){
@@ -12,7 +12,7 @@
 	$last_date = date('Y-m-d',strtotime('last day of this month'));
 	$first_day_of_year=date('Y-m-d', strtotime('first day of january this year'));
 ?>
-<style> ,thtd{text-align: center;} </style>
+<style> th,td{text-align: center;} </style>
 <link rel="stylesheet" href="dist/css/select2.min.css" />
 <body class="hold-transition skin-blue sidebar-mini">
 <script type='text/javascript'>
@@ -80,10 +80,10 @@ setInputDate("#startDate");
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-		<h1>Date Wise Cash Sales Reports View & Print </h1>
+		<h1>Date Wise Expense Reports View & Print </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Date Wise Cash Sales Reports View & Print </li>
+        <li class="active">Date Wise Expense Reports View & Print </li>
       </ol>
     </section>
     <!-- Main content -->
@@ -92,29 +92,45 @@ setInputDate("#startDate");
         <div class="col-xs-12">
 			<div class="box">
 				<div class="box-body" style="height: auto;"> 
-				<h4 style="color: gray;text-align: center;">Date Wise Cash Sales Wise Reports </h4>
-					<h5 style="text-align: center;">**Date wise ALL HAND CASH summary view & Print As PDF**</h5>
+				<h4 style="color: gray;text-align: center;">Date Wise Expense Reports </h4>
+					<h5 style="text-align: center;">**Date wise Expense summary view & Print As PDF**</h5>
 						<form  class="form-horizontal" method="POST">
 							<div class="col-md-12">
 							    <div class="col-md-2"></div>
-							    <div class="col-md-3">
-    								<label for="categoryName" class="control-label">Start Date :</label>
-    								<input name="min" id="startDate" style="padding: inherit;" class="form-control datetimepicker" placeholder="Select Start date" name="startDate" type="date" value="<?php echo date('Y-m-d');?>" data-date-format="yyyy-mm-dd"  required/>					
-    							</div>
+							  
     							<div class="col-md-3">
-    								<label for="categoryName" class="control-label">End Date :</label>
-    								<input name="min" id="endtDate" style="padding: inherit;" class="form-control datetimepicker" placeholder="Select Start date" name="endDate" type="date" value="<?php echo date('Y-m-d');?>" data-date-format="yyyy-mm-dd"  required/>					
+    								<label for="Date" class="control-label">Select Date :</label>
+    								<input  id="Date" style="padding: inherit;" class="form-control datetimepicker" placeholder="Select date" name="Date" type="date" value="<?php echo date('Y-m-d');?>" data-date-format="yyyy-mm-dd"  required/>					
     							</div>
 							    <div class="col-md-1">
-    								<button type="button" id="btndisplay" class="btn btn-default btn-flat pull-left" name="btndisplay" onclick="showMyData();" style="background-color: #3f3e93;color: #fff;margin-top: 48%;border-color: #3f3e93;"><i class="fa fa-search"></i> Search </button>
-    								
+    								<button type="button" id="btndisplay" class="btn btn-default btn-flat pull-left" name="btndisplay" onclick="generateExpenseReport();" style="background-color: #3f3e93;color: #fff;margin-top: 48%;border-color: #3f3e93;"><i class="fa fa-search"></i> Generate Expense Report </button>
     							</div>
     					    </div>
 						</form><br><br>
 						<!--input type="submit" id="btndisplay" value="show" onclick="showMyData();"-->
 						<div id="myDiv"></div>
-						 <br><br>
-					
+                        <div class="form-group col-md-12">
+                                <div>
+                                   
+                            </div>
+                            </div>
+                            <div>
+                                    <a href="" target="_blank" class="btn btn-primary float-left p-2 mb-2" id="reportBtn"  onclick="expenseReport()" style="display:none;">Generate PDF Report </a>
+                                </div>
+                                <table id="ExpenseReportTable" class="table table-bordered" style="width:100%;">
+                                    <thead>
+                                        <th width="4%">SL</th>
+                                        <th width="25%">Particulars</th>
+                                        <th width="15%">Voucher</th>
+                                        <th width="15%">Grand Total</th>
+                                        <th width="15%">Cash In</th>
+                                        <th width="15%">Cash Out</th>
+                                        <th width="15%">Balance</th> 
+                                    </thead>
+                                    <tbody id="manageExpenseReportTable">
+                                    </tbody>
+                                </table>
+					<br><br>
 				</div>
             </div>
          </div>
@@ -129,14 +145,13 @@ setInputDate("#startDate");
 </div>
 <?php include 'includes/scripts.php'; ?>
 <script src="dist/js/select2.min.js"></script>
+<script src="includes/js/generateExpenseReport.js"></script>
 <script>
     $("#add_party").select2( {
     	placeholder: "Select Party Name",
     	allowClear: true
     	} );
     	
-    
-   
  </script>  	
 </body>
 </html>

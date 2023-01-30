@@ -3,7 +3,7 @@
     <div class="modal-dialog" style="width:45%;">
         <div class="modal-content">
             <div class="modal-header float-left">
-                <h4 class="modal-title float-left"> Add ExpenseType</h4>
+                <h4 class="modal-title float-left"> Add Expense</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
             </div> 
             <div class="modal-body">
@@ -23,9 +23,8 @@
                         <div class="form-group row">
                            
                             <div class="col-sm-6">
-                            <label for="expenseType">Expenses</label> 
+                            <label for="expenseType">Expense Type</label> 
                             <select class="form-control" name="expenseType" id="expenseType">
-                                <option value="" selected>~~ Select Type ~~</option>
                                 <?php
                                 $sql = "SELECT id,name FROM `expense_types` WHERE status='Active' AND deleted='No'  ORDER BY `id`  DESC";
                                 $query = $conn->query($sql);
@@ -41,7 +40,6 @@
                             <div class="col-sm-6">
                                 <label for="expenseBy">Expense By</label> 
                                 <select class="form-control" name="expenseBy" id="expenseBy" >
-                                    <option value="" selected>~~ Expense By ~~</option>
                                     <?php
                                     $sql = "SELECT `id`,`fname`,`lname` FROM `tbl_users` WHERE accountStatus='approved' AND deleted='No' ORDER BY `id`  DESC";
                                     $query = $conn->query($sql);
