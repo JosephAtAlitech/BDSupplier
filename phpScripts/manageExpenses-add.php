@@ -36,7 +36,7 @@ if(isset($_POST['saveExpense'])) {
         $voucherNo = "000001";
     }
      //$maxCode =LPAD(IFNULL(max($row['voucherNo']),0)+1, 6, 0);
-   
+   // this istest csdfsa dfsad
     //  $maxCode = str_pad($maxCode, 6, '0', STR_PAD_LEFT);
     //$maxCode='000099';
     $party_id = $expense_by;

@@ -59,6 +59,7 @@
     </section>   
     
   </div>
+  
    
   <?php include 'includes/footer.php'; ?>
   <?php include 'includes/expense-modal.php'; ?>
