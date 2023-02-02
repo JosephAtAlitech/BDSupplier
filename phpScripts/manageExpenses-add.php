@@ -40,7 +40,8 @@ if(isset($_POST['saveExpense'])) {
     //  $maxCode = str_pad($maxCode, 6, '0', STR_PAD_LEFT);
     //$maxCode='000099';
     $party_id = $expense_by;
-    //$voucherNo = $maxCode;
+    //$voucheaxCode;
+
 
     $payment_method = "Cash";
     $paymentDate = $toDay;

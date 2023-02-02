@@ -146,6 +146,18 @@
                 </ul>
             </li>
             <?php } ?>
+            <?php if(strtolower($_SESSION['userType']) != 'sales executive' && strtolower($_SESSION['userType']) != "shop executive") { ?>
+			<li class="treeview">
+                <a href="#">
+                    <i class="fa fa-handshake-o"></i>
+                    <span>Cheque</span>
+                    <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="chequeEntryPanel-view.php"><i class="fa fa-bars"></i> <span>Cheque Entry</span></a></li>
+                </ul>
+            </li>
+            <?php } ?>
             <?php   if(strtolower($_SESSION['userType']) == "admin coordinator" || strtolower($_SESSION['userType']) == "admin support" || strtolower($_SESSION['userType']) == "admin support plus" || strtolower($_SESSION['userType']) == 'super admin') { ?>
             <li class="treeview">
                 <a href="#">
