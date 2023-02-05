@@ -124,7 +124,7 @@
                     </div> 
                     <div class="modal-footer">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-					<button type="submit" class="btn btn-success btn-flat" name="form_addCheque" id="form_addCheque"><i class="fa fa-save"></i> Save </button>
+					<button type="submit" class="btn btn-success entryBtn btn-flat" name="form_addCheque" id="form_addCheque"><i class="fa fa-save"></i> Save </button>
                     </div>
                     </form>
 				  
@@ -153,24 +153,25 @@
                 <input disabled type="hidden" value="" class="form-control col-sm-6" id="amount" name="amount" >
                 <input disabled type="hidden" value="" class="form-control col-sm-6" id="bankName" name="bankName" >
                 <input disabled type="hidden" value="" class="form-control col-sm-6" id="tbl_partyId" name="tbl_partyId" >
+                <input disabled type="hidden" value="" class="form-control col-sm-6" id="partyType" name="partyType" >
                 <div class="col-sm-6">
                 <div class="form-group">
             
             <div class="col-sm-12">
                <label for="place_chequeNo" class="">Cheque No</label> 
-               <input disabled type="text" class="form-control col-sm-6" id="place_chequeNo" name="place_chequeNo" >
+               <input  type="text" class="form-control col-sm-6" id="place_chequeNo" name="place_chequeNo" readonly>
            </div>
             <div class="col-sm-12">
                <label for="place_partyName" class="">Party Name</label> 
-               <input disabled type="text" value="" class="form-control col-sm-6" id="place_partyName" name="place_partyName" >
+               <input  type="text" value="" class="form-control col-sm-6" id="place_partyName" name="place_partyName" readonly >
            </div>
             <div class="col-sm-6">
                <label for="place_receivingDate" class="">Receiving Date</label> 
-               <input disabled type="text" class="form-control col-sm-6" id="place_receivingDate" name="place_receivingDate" >
+               <input  type="text" class="form-control col-sm-6" id="place_receivingDate" name="place_receivingDate" readonly>
             </div>
             <div class="col-sm-6">
                <label for="place_chequeDate" class="">Cheque Date</label> 
-               <input disabled type="text" class="form-control col-sm-6" id="place_chequeDate" name="place_chequeDate">
+               <input  type="text" class="form-control col-sm-6" id="place_chequeDate" name="place_chequeDate"readonly>
             </div>
    
    </div>

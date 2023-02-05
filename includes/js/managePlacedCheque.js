@@ -1,5 +1,4 @@
 
-
 var managePlacedChequeTable;
 
 
@@ -10,8 +9,6 @@ $(document).ready(function() {
 		'ajax': 'phpScripts/managePlacedCheque.php',
 		'order': [],
 		'dom': 'Bfrtip',
-		'serverSide': true,
-		'deferRender': true,
         'buttons': [
             'pageLength','copy', 'csv', 'pdf', 'print'
         ],
@@ -32,7 +29,7 @@ function deletePlacedCheque(id){
 		var Id = id;
 		var fd = new FormData();
 		fd.append('Id',Id);
-		fd.append('action-delete',"deletePlacedCheque");
+		fd.append('action_delete',"deletePlacedCheque");
 		$.ajax({
 		type: 'POST',
 		url: 'phpScripts/managePlacedCheque.php',

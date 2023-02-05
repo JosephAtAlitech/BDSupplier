@@ -23,13 +23,19 @@ $(document).ready(function() {
 			$('#managePurchaseProductTable').html(res[0]);
 			if(res.length > 1){
     			$('#add_grandTotal').val(res[1]);
+    			$('#temp_grandTotal').val(res[1]);
     			if($('#add_paid').val() == ''){
     			  $('#add_paid').val('0');
     			}
+                if($('#add_discount').val() == ''){
+                    $('#add_discount').val('0');
+                  }
     			var paid = parseFloat($('#add_paid').val());
     			var grandTotal = parseFloat($('#add_grandTotal').val());
     			$('#add_due').val(grandTotal - paid);
     			$('#add_sessionId').val(res[2]);
+                var discount = parseFloat($('#add_discount').val());
+                $('#add_grandTotal').val(grandTotal - discount);
 			}
 		},
 		error: function (xhr) {
@@ -55,9 +61,15 @@ function loadPurchaseProductTable(){
           if($('#add_paid').val() == ''){
               $('#add_paid').val('0');
           }
+        //   if($('#add_discount').val() == ''){
+        //     $('#add_discount').val('0');
+        //   }
+          
           var paid = parseFloat($('#add_paid').val());
-          var grandTotal = parseFloat($('#add_grandTotal').val());
+    	  var grandTotal = parseFloat($('#add_grandTotal').val());
           $('#add_due').val(grandTotal - paid);
+        //   var discount = parseFloat($('#add_discount').val());
+        //   $('#add_grandTotal').val(grandTotal - discount);
       },error: function (xhr) {
             alert(xhr.responseText);
         }
@@ -77,9 +89,15 @@ function loadRealPurchaseProductsTable(){
           if($('#edit_paid').val() == ''){
               $('#edit_paid').val('0');
           }
+        //   if($('#add_discount').val() == ''){
+        //     $('#add_discount').val('0');
+        //   }
+          
           var paid = parseFloat($('#edit_paid').val());
           var grandTotal = parseFloat($('#edit_grandTotal').val());
           $('#edit_due').val(grandTotal - paid);
+        //   var discount = parseFloat($('#add_discount').val());
+        //   $('#add_grandTotal').val(grandTotal - discount);
       },error: function (xhr) {
             alert(xhr.responseText);
         }
@@ -140,11 +158,23 @@ function deletePurchaseProducts(tempPurchaseProductsId){
 	}
 }
 
-$('#add_paid').keyup(function() {
-        var grandTotal = parseFloat($('#add_grandTotal').val()); // Or parseInt if integers only
-        var paid = parseFloat($('#add_paid').val());
-        $('#add_due').val(grandTotal - paid);
+$('.purchaseCal').keyup(function() {
+        var discount = $('#add_discount').val();
+        var grandTotal = parseFloat($('#temp_grandTotal').val()); // Or parseInt if integers only
+        var paid = $('#add_paid').val();
+
+        if (isNaN(paid)) {
+            paid = 0;
+        }
+        if (isNaN(discount)) {
+            discount = 0;
+        }
+        $('#add_grandTotal').val(grandTotal-discount);
+        var grandTotal2 = grandTotal-discount;
+        $('#add_due').val(grandTotal2 - parseFloat(paid));
   });
+
+
   
   $('#edit_paid').keyup(function() {
         var grandTotal = parseFloat($('#edit_grandTotal').val()); // Or parseInt if integers only
@@ -211,6 +241,8 @@ $("#form_editPurchase").submit(function(event) {
       var totalAmount=$('#edit_grandTotal').val();
       var paidAmount=$('#edit_paid').val();
       var dueAmount=$('#edit_due').val();
+    
+
         
       var fd = new FormData();
       fd.append('purchaseDate',purchaseDate);
@@ -517,6 +549,8 @@ function loadCustomersSuppliers(tblType){
 	  var totalAmount=$('#add_grandTotal').val();
 	  var paidAmount=$('#add_paid').val();
 	  var dueAmount=$('#add_due').val();
+      var discount=$('#add_discount').val();
+      
 		
 	  var fd = new FormData();
 	  fd.append('purchaseDate',purchaseDate);
@@ -525,6 +559,7 @@ function loadCustomersSuppliers(tblType){
 	  fd.append('totalAmount',totalAmount);
 	  fd.append('paidAmount',paidAmount);
 	  fd.append('dueAmount',dueAmount);
+      fd.append('discount',discount);
 	  fd.append('sessionId',sessionId);
 	  
 	  fd.append('savePurchase','1');

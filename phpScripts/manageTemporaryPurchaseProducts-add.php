@@ -119,6 +119,7 @@ if (isset($_POST['savePurchase'])) {
 	$totalAmount = $_POST['totalAmount'];
 	$paidAmount = $_POST['paidAmount'];
 	$dueAmount = $_POST['dueAmount'];
+	$discount = $_POST['discount'];
 	$purchaseCode = 0;
 
 	try {
@@ -131,12 +132,12 @@ if (isset($_POST['savePurchase'])) {
 		$sql = "select id from tbl_tempPurchaseProducts where sessionId='$sessionId'";
 		$result = $conn->query($sql);
 		if ($result->num_rows > 0) {
-			$sql = "INSERT INTO tbl_purchase (purchaseOrderNo,purchaseDate,tbl_supplierId,purchaseType,status,totalAmount,paidAmount,dueAmount, chalanNo,createdBy,createdDate) 
-					VALUES ('$purchaseCode','$purchaseDate','$supplier','Local','Active','$totalAmount','$paidAmount','$dueAmount', '$chalanNumber','$loginID','$toDay')";
+			$sql = "INSERT INTO tbl_purchase (purchaseOrderNo,purchaseDate,tbl_supplierId,purchaseType,status,totalAmount,discount, paidAmount,dueAmount, chalanNo,createdBy,createdDate) 
+					VALUES ('$purchaseCode','$purchaseDate','$supplier','Local','Active','$totalAmount','$discount','$paidAmount','$dueAmount', '$chalanNumber','$loginID','$toDay')";
 			if ($conn->query($sql)) {
 				$purchaseId = $conn->insert_id;
 				$sql = "INSERT INTO tbl_purchaseProducts (tbl_productsId, quantity, tbl_purchaseId, purchaseAmount, totalAmount, wholeSalePrice, walkinCustomerPrice, tbl_wareHouseId, manufacturingDate, expiryDate, createdBy, createdDate)
-						SELECT tbl_productsId, quantity, '$purchaseId', purchaseAmount, totalAmount, wholeSalePrice, walkinCustomerPrice, tbl_wareHouseId, manufacturingDate, expiryDate, '$loginID', '$today' FROM tbl_tempPurchaseProducts where sessionId='$sessionId';";
+						SELECT tbl_productsId, quantity, '$purchaseId', purchaseAmount, totalAmount, wholeSalePrice, walkinCustomerPrice, tbl_wareHouseId, manufacturingDate, expiryDate, '$loginID', '$toDay' FROM tbl_tempPurchaseProducts where sessionId='$sessionId';";
 				if ($conn->query($sql)) {
 					$purchaseProductId = $conn->insert_id;
 					$sql = "SELECT tbl_productsId, quantity, tbl_wareHouseId, id 

@@ -74,10 +74,10 @@
                                     <option value="" selected>~~ Select Product Name ~~</option>
                                     <?php
                                     $sql = "SELECT tbl_products.id,tbl_products.productName,tbl_products.productCode,tbl_brands.brandName, tbl_products.modelNo
-    										FROM tbl_products 
-    										LEFT OUTER JOIN tbl_brands ON tbl_brands.id=tbl_products.tbl_brandsId
-    										WHERE tbl_products.status='Active' AND tbl_products.deleted='No'
-    										ORDER BY tbl_products.id  DESC";
+                                            FROM tbl_products 
+                                            LEFT OUTER JOIN tbl_brands ON tbl_brands.id=tbl_products.tbl_brandsId
+                                            WHERE tbl_products.status='Active' AND tbl_products.deleted='No'
+                                            ORDER BY tbl_products.id  DESC";
                                     $query = $conn->query($sql);
                                     while ($prow = $query->fetch_assoc()) {
                                         echo "<option value='" . $prow['id'] . "'>" . $prow['productName'] . " - " . $prow['productCode'] . " (" . $prow['brandName'] . " - " . $prow['modelNo'] . ")</option>";
@@ -99,11 +99,16 @@
     					<div class="form-group">
     						<div class="col-md-7"></div>
     						<div class="col-md-5">
+                <label for="add_discount">Discount </label> 
+    							<input type="text" min="0" value="0" class="form-control purchaseCal" id="add_discount" name="discount" required>
+
     						<label for="add_grandTotal">Grand Total</label> 
-    							<input type="text" class="form-control" id="add_grandTotal" name="grandTotal" readonly>
+                <input type="hidden"  class="form-control" id="temp_grandTotal" value="0">
+    						
+    							<input type="text"  min="0" value="0"  class="form-control" id="add_grandTotal" name="grandTotal" readonly>
     						
     						<label for="add_paid">Paid </label> 
-    							<input type="text" class="form-control" id="add_paid" name="paid" required>
+    							<input type="text" class="form-control purchaseCal" id="add_paid" name="paid" required>
     						
     						<label for="add_due">Due </label> 
     							<input type="text" class="form-control" id="add_due" name="due" required>

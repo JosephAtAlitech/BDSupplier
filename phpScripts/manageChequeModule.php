@@ -12,16 +12,7 @@ date_default_timezone_set('Asia/Dhaka');
 include('resize_image_product.php');
 
 // Get Expensetype data for edit form
-if(isset($_GET['page'])){
-    $page = $_GET['page'];
-        if($page == 'editExpenseType'){
-        $id = $_GET['id'];
-        $sql_expanseType = "select * from expense_types where id=$id AND deleted='No'";
-        $query_expanseType = $conn->query($sql_expanseType);
-    	$row_expanseType = $query_expanseType->fetch_assoc();
-        echo json_encode($row_expanseType);
-     }
-} elseif(isset($_POST['saveCheque'])) {
+if(isset($_POST['saveCheque'])) {
  
         $chequeReceivingDate = $_POST['chequeReceivingDate'];
         $partyType = $_POST['partyType'];
@@ -55,37 +46,16 @@ if(isset($_GET['page'])){
     	}
         $conn->close();
     
-     // Update Expense Type
-    }elseif(isset($_POST['action']) == "updateExpenseType") {
-        $id = $_POST['expenseTypeId'];
-        $expenseTypeName = $_POST['expenseTypeName'];
-        $expenseTypeStatus = $_POST['expenseTypeStatus'];
-        $toDay= date('H:i:s');
-        try{
-            $conn->begin_transaction();
-            $sql = "UPDATE expense_types set name='$expenseTypeName',status='$expenseTypeStatus',updated_by='$loginID',Updated_date='$toDay' where id='$id'";
-            
-            if ($conn->query($sql)) {
-               
-                $conn->commit();
-                echo json_encode('Success');
-            } else {
-                echo json_encode($conn->error);
-            }
-        }catch(Exception $e){
-            $conn->rollBack();
-            echo 'RollBack';
-        }
-    }
+ 
+    }     // Delete Exp Cheque
     elseif (isset($_POST['action_delete'])== "deleteCheque") {
         $id = $_POST['Id'];
     	
         $sql = "UPDATE tbl_cheque SET deleted='Yes', deleted_date='$toDay', deleted_by='$loginID' WHERE id = '$id'";
         if ($conn->query($sql)) {
-            $query = $conn->query($sql);
-    		echo json_encode('Success');
+    		echo json_encode(['status'=> "Success"]);
         } else {
-            json_encode($conn->error);;
+            json_encode($conn->error);
         }
         
         
@@ -158,6 +128,7 @@ if(isset($_GET['page'])){
         $chequeNo = $_POST['chequeNo'];
         $partyId = $_POST['partyId'];
         $bankName = $_POST['bankName'];
+        $partyType = $_POST['partyType'];
         $partyName = $_POST['partyName'];
         $amount = $_POST['amount'];
         $chequeDate = $_POST['chequeDate'];
@@ -167,6 +138,14 @@ if(isset($_GET['page'])){
         $status = $_POST['chequeStatus'];
         if($chequeStatus === 'Clear'){
             $status = 'Completed';
+        }
+        if($partyType == 'WICustomer'){
+            $partyType = "WalkinCustomer";
+            $chequeVoucherType = "WalkinSale";
+        }
+        else if($partyType == 'Customers'){
+            $partyType = "Party";
+            $chequeVoucherType = "PartySale";
         }
         
         try{    
@@ -187,11 +166,10 @@ if(isset($_GET['page'])){
                                 $voucherNo = "000001";
                             }
                             $sqlVoucher = "INSERT INTO tbl_paymentVoucher(tbl_partyId, amount, entryBy, paymentMethod, chequeNo, paymentDate, chequeIssueDate, type, remarks, voucherNo,voucherType, customerType, chequeBank,entryDate) 
-                                    VALUES ('$partyId','$amount','$loginID','Cheque','$chequeNo','$bounceAndClearanceDate','$chequeDate','paymentReceived','Voucher Entry for party Sale transaction','$voucherNo','PartySale', 'Party', '$bankName','$toDay')";
+                                    VALUES ('$partyId','$amount','$loginID','Cheque','$chequeNo','$bounceAndClearanceDate','$chequeDate','paymentReceived','Voucher Entry for party Sale transaction','$voucherNo','$chequeVoucherType', '$partyType', '$bankName','$toDay')";
                             if($conn->query($sqlVoucher)){
                                 $conn->commit();
                                 echo json_encode('Success');
-
                             }else{
                                 echo json_encode('Error: '.$conn->error);
                             }
@@ -200,7 +178,6 @@ if(isset($_GET['page'])){
                         $conn->commit();
                         echo json_encode('Success');
                     }
-                  
                 }
                 else {
                     echo json_encode($conn->error);
@@ -214,25 +191,25 @@ if(isset($_GET['page'])){
     		$conn->rollBack();
     		echo 'RollBack';
     	}
-        
-    
-     // Update Expense Type
-    }
+           
+    }  //Show Cheque Placement Data
     elseif(isset($_POST['chequePlacementData']) == "chequePlacementData"){
         $chequeId= $_POST['chequeId'];
+     
         $sql = "SELECT tbl_cheque_placement.*, tbl_cheque.cheque_no FROM tbl_cheque_placement  
                 join tbl_cheque on tbl_cheque_placement.tbl_cheque_id =tbl_cheque.id
                 WHERE tbl_cheque_id = $chequeId AND tbl_cheque_placement.deleted ='No' ORDER BY created_date DESC";
 		$results = $conn->query($sql);	
-       //  $datas[] =null;
+        $datas =[];
 		while ($Arows = $results->fetch_array()) {
             $datas[]= $Arows;    
 		}//End while
+        
 		echo json_encode($datas);
     }
 
 else{
-    /* Display Data from Expense type table */
+    /* Display Data from Cheque table */
 
 		$sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_bank.bank_name,tbl_bank_branch.branch_name FROM `tbl_cheque`  
                 JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
@@ -261,7 +238,6 @@ else{
             $button .= ' <li><a href="#" data-toggle="modal" onclick="openChequePlanement(' . $id . ') " ><i class="fa fa-mail-reply"></i>Cheque Placement</a></li>';
          }
 			          
-           
                 
             $button .= '</ul></div>';
             $output['data'][] = array(
@@ -276,10 +252,6 @@ else{
 			);
 		} //End while 
 		echo json_encode($output);
-
 }
-
-
-
 
 ?>

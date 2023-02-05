@@ -35,7 +35,7 @@
 							<label for="add_maxPrice"> Max Sale Price </label>
 							<input type="text" class="form-control" id="add_maxPrice" name="maxPrice" value="0" onblur="MaximumNValidate()" placeholder=" Maximum Price ">
 						</div>
-					</div>purchaseLocal-return.php
+					</div>
 					<div class="form-group">
 						<div class="col-sm-6">
 							<label for="add_mfgDate"> Mfg. Date </label>

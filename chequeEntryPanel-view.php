@@ -35,10 +35,10 @@
                         }
 					?>
 
-            <a href="#eventEntry" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> Event Entry</a>
-            <a href="#expenseHead" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> Expense Head</a>
-            <a href="#expenseForm" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> Expense Form</a>
-            <a href="placedCheque-view.php" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i>Placemented Cheque</a>
+            <!-- <a href="#eventEntry" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> Event Entry</a> -->
+            <!-- <a href="#expenseHead" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> Expense Head</a>
+            <a href="#expenseForm" data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><i class="fa fa-plus"></i> Expense Form</a> -->
+            <a href="placedCheque-view.php" class="btn btn-success btn-sm btn-flat">Placemented Cheques   <i class="fa fa-arrow-right"></i></a>
 			   </div>
 			   <div class="col-xs-6">
 				<div id='divMsg' class='alert alert-success alert-dismissible successMessage'></div>

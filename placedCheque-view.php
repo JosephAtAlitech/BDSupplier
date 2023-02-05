@@ -37,14 +37,14 @@
 			</div>
             </div>
             <div class="box-body">
-                <input type="hidden" id="type" name="type" value="<?php echo $type;?>" />
+                <!-- <input type="hidden" id="type" name="type" value="<?php echo $type;?>" /> -->
                 <table id="managePlacedChequeTable" class="table table-bordered" style="width:100%;">
                 <thead>
                    <th width="4%">SN</th>
                    <th>Placement Date</th>
                    <th>Clearance date</th>
                    <th>Status</th>
-                   <th width="4%">Action</th>
+                  
                 </thead>
                 </table>
             </div>
