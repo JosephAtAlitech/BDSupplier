@@ -81,13 +81,13 @@ if(isset($_POST['saveExpense'])) {
 }
 
 // Delete Expense Type
-elseif (isset($_POST['action']) == "action_delete") {
+elseif (isset($_POST['action_delete']) == "action_delete") {
         $id = $_POST['id'];
     	
         $sql = "UPDATE expenses SET deleted='Yes', deleted_date='$toDay', deleted_by='$loginID' WHERE id = '$id'";
         if ($conn->query($sql)) {
             $query = $conn->query($sql);
-    		echo json_encode('Success');
+    		echo json_encode(['status'=> "Success"]);
         } else {
             json_encode($conn->error);;
         }

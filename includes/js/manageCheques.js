@@ -78,8 +78,6 @@ function deletePlacement(id, chequeId, chequeNo){
 		var chequeId = chequeId;
 		var chequeNo = chequeNo;
 
-		//alert(chequeNo)
-		//var chequeStatus = chequeStatus;
 		var fd = new FormData();
 		fd.append('id',Id);
 		fd.append('chequeId',chequeId);
@@ -123,10 +121,9 @@ function deletePlacement(id, chequeId, chequeNo){
 		submitButton:'$form_addCheque button [type="Submit"]',
 		submitHandler: function(validator, form, submitButton){
 		  $(".entryBtn").removeAttr("disabled");
-		
+
 		  var chequeReceivingDate = $("#chequeReceivingDate").val();
 		  var partyType = $("#partyType").val();
-		 
 		  var voucherType = $("#voucherType").val();
           var partyId = $("#partyId").val();
           var bankId = $("#bankId").val();
@@ -213,15 +210,13 @@ function deletePlacement(id, chequeId, chequeNo){
 			});
 		}); 
 		
-	
+	/*------------------ End Save Entry Cheque & validation panel ---------------------- */
 	
 
  function openChequePlanement(id) {
 	$(".btnattr").removeAttr("disabled");
-	//alert(id)
 	var dataString = "page1=ShowChequeData&id="+id;
-	// fd.append('Id',Id);
-	// fd.append('ShowChequeData',"ShowChequeData");
+
 	$.ajax({
 	type: 'GET',
 	caches: false,
@@ -258,9 +253,8 @@ function deletePlacement(id, chequeId, chequeNo){
 		alert(xhr.responseText);
 	}
   });
-
-
 }
+
 function ChequePlanement(id) {
 		var fd= new FormData();
 		fd.append('chequeId',id);
@@ -274,9 +268,7 @@ function ChequePlanement(id) {
 			dataType: 'json',
 			contentType: false,
 			processData: false,
-		
 			success:function(prow){
-					
 					var i=0;
 					var j=1;
 					var btn = '';
@@ -316,7 +308,6 @@ function ChequePlanement(id) {
 			        	$("#chequeStatus").removeAttr("disabled");
 			         	$("#bounceAndClearanceDate").removeAttr("disabled");
 					}
-				
 				manageEntryChequeTable.ajax.reload(null, false);
 			},
 			complete: function () {
@@ -329,112 +320,102 @@ function ChequePlanement(id) {
 }
 
 
-
-
-			/*------------------ End Save Expense Type & validation panel ---------------------- */
+	
 	
 
-		
-			$("#partyId").select2( {
-				allowClear: true,
-				selectOnClose: true
-			} );
-			$("#bankId").select2({
-				placeholder: "~~ Select Bank ~~",
-				allowClear: true
-			});
-			$("#branchId").select2({
-				placeholder: "~~ Select Bank Branch ~~",
-				allowClear: true
-			});
-			
+	$("#partyId").select2( {
+		allowClear: true,
+		selectOnClose: true
+	} );
+	$("#bankId").select2({
+		placeholder: "~~ Select Bank ~~",
+		allowClear: true
+	});
+	$("#branchId").select2({
+		placeholder: "~~ Select Bank Branch ~~",
+		allowClear: true
+	});
 
+		/*------------------ Start Save cheque Placement & validation panel ---------------------- */
 
-
-			$(document).ready(function() {
-				$('#form_addChequePlacement').bootstrapValidator({
-				live:'enabled',
-				message:'This value is not valid',
-				submitButton:'$form_addChequePlacement button [type="Submit"]',
-				submitHandler: function(validator, form, submitButton){
-				  var chequeId = $("#chequeId").val();
-				  var chequeNo = $("#place_chequeNo").val();
-				  var placementDate = $("#placementDate").val();
-				  var chequeDate = $("#place_chequeDate").val();
-				  var partyId= $("#tbl_partyId").val();
-				  var partyName= $("#place_partyName").val();
-				  var partyType= $("#partyType").val();
-				  var bankName = $("#bankName").val();
-				  var amount = $("#amount").val();
-				  var chequeStatus = $("#chequeStatus").val();
-				  var bounceAndClearanceDate = $("#bounceAndClearanceDate").val();
-				  alert(partyType);
-			
-				  var fd = new FormData();
-				  fd.append('saveChequePlacement',"saveChequePlacement");
-				  fd.append('chequeId',chequeId);
-				  fd.append('chequeNo',chequeNo);
-				  fd.append('amount',amount);
-				  fd.append('partyId',partyId);
-				  fd.append('partyType',partyType);
-				  fd.append('partyName',partyName);
-				  fd.append('bankName',bankName);
-				  fd.append('chequeDate',chequeDate);
-				  fd.append('placementDate',placementDate);
-				  fd.append('chequeStatus',chequeStatus);
-				  fd.append('bounceAndClearanceDate',bounceAndClearanceDate);
-				  $.ajax({
-						type: 'POST',
-						url: 'phpScripts/manageChequeModule.php',
-						data: fd,
-						contentType: false,
-						processData: false,
-						dataType: 'json',
-						success: function(response){
-							
-							if(response == "Success"){
-								
-								$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Placed");
-								$("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
-								  $(this).hide(); n();
-								});
-								$(".btnattr").removeAttr("disabled");
-								ChequePlanement(chequeId);
-								manageEntryChequeTable.ajax.reload(null, false);
-		
-								// $("#chequeId").val("");
-								// $("#chequeStatus").val("");
-							
-							}
-						},error: function (xhr) {
-							alert(xhr.responseText);
-						}
-					  });
-				},
-				feedbackIcons: {
-					valid: 'glyphicon glyphicon-ok',
-					invalid: 'glyphicon glyphicon-remove',
-					validating: 'glyphicon glyphicon-refresh'
-				},
-				excluded: [':disabled'],
-				fields: {
-						
-						name: {
-							validators: {
-									stringLength: {
-									min: 3,
-								},
-									notEmpty: {
-									message: 'Please Insert Type'
-								},
-								regexp: {
-									regexp: /^([a-zA-Z0-9_ "\.\-\s\,\;\:\/\&\$\%\(\)]+\s)*[a-zA-Z0-9_ "\.\-\s\,\;\:\/\&\$\%\(\)]+$/,
-									message: 'Please insert alphanumeric value only'
-								}
-							}
+	$(document).ready(function() {
+		$('#form_addChequePlacement').bootstrapValidator({
+		live:'enabled',
+		message:'This value is not valid',
+		submitButton:'$form_addChequePlacement button [type="Submit"]',
+		submitHandler: function(validator, form, submitButton){
+		var chequeId = $("#chequeId").val();
+		var chequeNo = $("#place_chequeNo").val();
+		var placementDate = $("#placementDate").val();
+		var chequeDate = $("#place_chequeDate").val();
+		var partyId= $("#tbl_partyId").val();
+		var partyName= $("#place_partyName").val();
+		var partyType= $("#partyType").val();
+		var bankName = $("#bankName").val();
+		var amount = $("#amount").val();
+		var chequeStatus = $("#chequeStatus").val();
+		var bounceAndClearanceDate = $("#bounceAndClearanceDate").val();
+	
+			var fd = new FormData();
+			fd.append('saveChequePlacement',"saveChequePlacement");
+			fd.append('chequeId',chequeId);
+			fd.append('chequeNo',chequeNo);
+			fd.append('amount',amount);
+			fd.append('partyId',partyId);
+			fd.append('partyType',partyType);
+			fd.append('partyName',partyName);
+			fd.append('bankName',bankName);
+			fd.append('chequeDate',chequeDate);
+			fd.append('placementDate',placementDate);
+			fd.append('chequeStatus',chequeStatus);
+			fd.append('bounceAndClearanceDate',bounceAndClearanceDate);
+			$.ajax({
+				type: 'POST',
+				url: 'phpScripts/manageChequeModule.php',
+				data: fd,
+				contentType: false,
+				processData: false,
+				dataType: 'json',
+				success: function(response){
+					
+					if(response == "Success"){
+						$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Placed");
+						$("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
+							$(this).hide(); n();
+						});
+						$(".btnattr").removeAttr("disabled");
+						ChequePlanement(chequeId);
+						manageEntryChequeTable.ajax.reload(null, false);
+					}
+				},error: function (xhr) {
+					alert(xhr.responseText);
+				}
+				});
+		},
+		feedbackIcons: {
+			valid: 'glyphicon glyphicon-ok',
+			invalid: 'glyphicon glyphicon-remove',
+			validating: 'glyphicon glyphicon-refresh'
+		},
+		excluded: [':disabled'],
+		fields: {
+				
+				name: {
+					validators: {
+							stringLength: {
+							min: 3,
+						},
+							notEmpty: {
+							message: 'Please Insert Type'
+						},
+						regexp: {
+							regexp: /^([a-zA-Z0-9_ "\.\-\s\,\;\:\/\&\$\%\(\)]+\s)*[a-zA-Z0-9_ "\.\-\s\,\;\:\/\&\$\%\(\)]+$/,
+							message: 'Please insert alphanumeric value only'
 						}
 					}
-					});
-				}); 
-				
+				}
+			}
+			});
+		}); 
+		
 				

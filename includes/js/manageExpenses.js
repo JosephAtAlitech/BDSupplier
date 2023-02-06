@@ -24,21 +24,26 @@ $(document).ready(function() {
 
 function deleteExpense(id){
     var conMsg = confirm("Are you sure to delete??");
+	var id =id;
 	if(conMsg){
-        var action = "action_delete";
+		var fd = new FormData();
+		fd.append('id',id);
+		fd.append('action_delete',  "action_delete");
         $.ajax({
     	    url: 'phpScripts/manageExpenses-add.php',
     		method:"POST",
-    		data:{action:action, id:id},
-		
-    		    success:function(response)
+    		data:fd,
+		    dataType: 'json',
+			contentType: false,
+			processData: false,
+    		success:function(response)
     		{
-				if(response == "Success"){
-					$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
+				if(response.status == "Success"){
+					$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Deleted");
 				   $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 					  $(this).hide(); n();
 					});
-					manageExpenseTypeTable.ajax.reload(null, false);
+					manageExpenseTable.ajax.reload(null, false);
 				}
     		},error: function (xhr) {
 			alert(xhr.responseText);

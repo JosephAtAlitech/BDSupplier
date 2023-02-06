@@ -159,9 +159,9 @@ function deletePurchaseProducts(tempPurchaseProductsId){
 }
 
 $('.purchaseCal').keyup(function() {
-        var discount = $('#add_discount').val();
+        var discount = parseFloat($('#add_discount').val());
         var grandTotal = parseFloat($('#temp_grandTotal').val()); // Or parseInt if integers only
-        var paid = $('#add_paid').val();
+        var paid = parseFloat($('#add_paid').val());
 
         if (isNaN(paid)) {
             paid = 0;
@@ -171,7 +171,7 @@ $('.purchaseCal').keyup(function() {
         }
         $('#add_grandTotal').val(grandTotal-discount);
         var grandTotal2 = grandTotal-discount;
-        $('#add_due').val(grandTotal2 - parseFloat(paid));
+        $('#add_due').val(grandTotal2 -paid);
   });
 
 

@@ -15,7 +15,7 @@
       <h1>Expense Type</h1>
       <ol class="breadcrumb">
         <li><a href="user-home.php"><i class="fa fa-dashboard"></i>Home</a></li>
-        <li class="active">Expenses Information</li>
+        <li class="active">Expenses Type</li>
       </ol>
     </section>
     <!-- Main content -->

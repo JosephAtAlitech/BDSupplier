@@ -15,7 +15,7 @@
                                 <input type="Date" class="form-control" id="expenseDate" name="expenseDate" placeholder="Enter Expense Date">
                             </div>
                             <div class="col-md-8">
-                                <label for="productCode">Expense Cause</label> 
+                                <label for="productCode">Expense Reason</label> 
                                 <input type="text" class="form-control" id="expenseCause" autocomplete="off" name="expenseCause" placeholder="Enter Expense Cause" />
                             </div>
                 

@@ -73,8 +73,7 @@ if(isset($_GET['page'])){
     	
         $sql = "UPDATE expense_types SET deleted='Yes', deleted_date='$toDay', deleted_by='$loginID' WHERE id = '$id'";
         if ($conn->query($sql)) {
-            $query = $conn->query($sql);
-    		echo json_encode('Success');
+    		echo json_encode(['status'=> "Success"]);
         } else {
             json_encode($conn->error);;
         }

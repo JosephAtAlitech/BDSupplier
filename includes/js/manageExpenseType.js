@@ -30,21 +30,22 @@ function deleteExpenseType(id){
 		type: 'POST',
 		url: 'phpScripts/manageExepnseType-add.php',
 		data: fd,
+		dataType: 'json',
 		contentType: false,
 		processData: false,
-    		success:function(response)
-    		{
-				if(response == "Success"){
-					$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
-				   $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
-					  $(this).hide(); n();
-					});
-					manageExpenseTypeTable.ajax.reload(null, false);
-
-				}
-    		},error: function (xhr) {
-			alert(xhr.responseText);
-		}
+		success:function(response)
+		{
+			if(response.status == "Success"){
+				$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Deleted");
+				$("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
+					$(this).hide(); n();
+				});
+				manageExpenseTypeTable.ajax.reload(null, false);
+			}
+		},
+		error: function (xhr) {
+		    alert(xhr.responseText);
+		    }
 	  });
 	}
 }
@@ -57,14 +58,12 @@ function deleteExpenseType(id){
 		message:'This value is not valid',
 		submitButton:'$expenseTypeForm button [type="Submit"]',
 		submitHandler: function(validator, form, submitButton){
-		
-		var name = $("#name").val();
-		
+		  var name = $("#name").val();
 			
 		  var fd = new FormData();
 		  fd.append('saveExpenseType',"saveExpenseType");
 		  fd.append('name',name);
-
+    
 		  $.ajax({
 				type: 'POST',
 				url: 'phpScripts/manageExepnseType-add.php',
@@ -75,13 +74,14 @@ function deleteExpenseType(id){
 				success: function(response){
 					if(response == "Success"){
 						$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
-					   $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
+					    $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 						  $(this).hide(); n();
 						});
-
+ 
 						manageExpenseTypeTable.ajax.reload(null, false);
 
 						$("#name").val('');
+						$("expbtn").removeAttr("Disabled");
 					}
 				},error: function (xhr) {
 					alert(xhr.responseText);
@@ -125,12 +125,11 @@ function deleteExpenseType(id){
 		message:'This value is not valid',
 		submitButton:'#expenseTypeFormUpdate button [type="Submit"]',
 		submitHandler: function(validator, form, submitButton){
-		var expenseTypeId = $("#editExpenseTypeId").val();
-		var expenseTypeName = $("#editExpenseTypeName").val();
-		var expenseTypeStatus = $("#editExpenseTypeStatus").val();
-		 
-		 var fd = new FormData();
-	
+		  var expenseTypeId = $("#editExpenseTypeId").val();
+		  var expenseTypeName = $("#editExpenseTypeName").val();
+		  var expenseTypeStatus = $("#editExpenseTypeStatus").val();
+		  
+		  var fd = new FormData();
 		  fd.append('expenseTypeId',expenseTypeId);
 		  fd.append('expenseTypeName',expenseTypeName);
 		  fd.append('expenseTypeStatus',expenseTypeStatus);
@@ -142,9 +141,9 @@ function deleteExpenseType(id){
 			contentType: false,
 			processData: false,
 			dataType: 'json',
-           success: function(msg) {
+            success: function(msg) {
               $("#loading-image").hide();
-           },
+            },
 			success: function(response){
 				
 				if(response == "Success"){
@@ -198,7 +197,7 @@ function deleteExpenseType(id){
 		//Expense Type Edit
 
 		function editExpenseType(id) {
-
+			$("expTbtn").removeAttr("Disabled");
 		    var dataString = "page=editExpenseType&id="+id;
 			//alert(id);
             $.ajax({
