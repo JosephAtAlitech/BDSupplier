@@ -23,7 +23,7 @@
                         <div class="col-sm-6">
                             <label for="partyId">Payment From [party]</label> 
                             <select class="form-control" name="partyId" id="partyId">
-                              
+                                <option selected>Select party </option>
                             </select>
                         </div>
                         </div>
@@ -36,8 +36,8 @@
                             <label for="voucherType">Voucher Type</label> 
                             
                             <select class="form-control"   name="voucherType" id="voucherType">
-							    <option value='paymentVoucher'>Payment</option>
                                 <option value='paymentReceivedVoucher'>Payment Received</option>		
+							    <option value='paymentVoucher'>Payment</option>
                             </select>
                         </div>
                         
@@ -58,7 +58,7 @@
                                 ?>
                             </select>
                         </div>
-                        <div class="col-sm-6">
+                        <!-- <div class="col-sm-6">
                             <label for="branchId">Branch Name</label> 
                             <select class="form-control" name="branchId" id="branchId" >
                               
@@ -72,25 +72,20 @@
                                 }
                                 ?>
                             </select>
-                        </div>
-                            </div>
-                    <div class="form-group">
-                   
-                    <div class="col-sm-6">
+                        </div> -->
+                        <div class="col-sm-6">
                             <label for="chequeType">Cheque Type</label> 
-                            <select class="form-control" name="chequeType" id="chequeType">
-                             
+                            <select class="form-control" name="chequeType" id="chequeType">   
 							    <option value='Account pay'>Account pay</option>
-                                <option value='Account pay'>Cash Cheque</option>		
+                                <option value='Account pay'>Cash Cheque</option>
                             </select>
+                          </div>
                         </div>
+                    <div class="form-group">
                         <div class="col-sm-6">
                             <label for="payTo">Pay To</label>  
                             <input type="text" class="form-control" id="payTo" name="payTo" placeholder="Pay To">
                          </div>
-                        </div>
-                        <div class="form-group">
-                         
                          <div class="col-sm-6">
                             <label for="depositeAccount">Deposite Account</label> 
                             <select class="form-control" name="depositeAccount" id="depositeAccount">
@@ -100,28 +95,39 @@
                                 while ($prow = $query->fetch_assoc()) {
                                     echo "
 									  <option value='" . $prow['id'] . "'>" . $prow['accountNo'] . " - " . $prow['accountName'] . "</option>
-									";
+								      	";
                                 }
                                 ?>
                              </select>
                          </div>
+                        </div>
+                        <div class="form-group">
+                         
                          	
 						 <div class="col-sm-6">
                             <label for="chequeNo">Cheque No</label> 
                             <input type="text" class="form-control" id="chequeNo" value='0' autocomplete="off" name="chequeNo" placeholder="Enter Cheque No">
                          </div>
+                         <div class="col-sm-6">
+                            <label for="chequeDate">Cheque Placement Date</label> 
+                            <input type="date" value="<?php echo date('Y-m-d');?>" class="form-control" id="chequeDate" name="chequeDate" placeholder="Enter Cheque Date">
+                        </div>
+
                         </div>
                         <div class="form-group">
                         
-                        <div class="col-sm-6">
-                            <label for="chequeDate">Cheque Date</label> 
-                            <input type="date" value="<?php echo date('Y-m-d');?>" class="form-control" id="chequeDate" name="chequeDate" placeholder="Enter Cheque Date">
-                        </div>
+                       
                         <div class="col-sm-6">
                             <label for="amount">Amount</label> 
-                            <input type="text" class="form-control" id="amount" value='0'  name="amount" placeholder="Enter Amount">
+                            <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter Amount">
                         </div>
-                    </div> 
+                        <div class="col-sm-6">
+                            <label for="add_chequeImage">Cheque Image</label>  
+                            <input type="file" class="form-control" id="add_chequeImage" name="chequeImage" onchange="loadFile(event);" accept=".png, .jpg, .jpeg" >
+							<img  src="images/broken_image.png" style="width: 60%;height: 110px;border-radius: 10%;margin-top: 8%;" id="output"/>
+						</div>
+                        </div>
+
                     <div class="modal-footer">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
 					<button type="submit" class="btn btn-success entryBtn btn-flat" name="form_addCheque" id="form_addCheque"><i class="fa fa-save"></i> Save </button>
@@ -188,8 +194,9 @@
                <select class="form-control" name="chequeStatus" id="chequeStatus">
                    <option value="" selected>~~ Select Status ~~</option>
                    <option value='Bounce'>Bounce</option>
-                   <option value='Clear'>Passed</option>
-                   <option value='Pending'>Running</option>				
+                   <option value='Completed'>Passed</option>
+                   <option value='Pending'>Running</option>		
+                   <option value='Cancel'>Cancel</option>			
                </select>
             </div>
            </div>

@@ -42,7 +42,26 @@
             </li>
             <li class="dropdown"  style="border-left: 1px solid white;border-right: 1px solid white;">
               <a class="dropdown-toggle" data-toggle="dropdown">Order <i class="fa fa-bell-o"></i> <span id="UnReadNotify" style="color: red;font-weight: 800;"> </span></a>
-                <ul class="dropdown-menu list-group-flush" id="notification" style="height: 400px;width: 320px;overflow-x: scroll;"></ul>
+                <ul class="dropdown-menu list-group-flush" id="notification" style="height: 400px;width: 320px;overflow-x: scroll;">
+              </ul>
+            </li>
+            
+            <li class="dropdown"  style="border-left: 1px solid white;border-right: 1px solid white;">
+            <?php
+                 $sql = "SELECT * FROM `tbl_cheque` WHERE deleted = 'No' AND `cheque_date` BETWEEN NOW() AND (SELECT date FROM `calender_tbl` WHERE date > now() AND day_type='Onday' ORDER BY date ASC LIMIT 1)";
+                 $query = $conn->query($sql);
+                 $total =  mysqli_num_rows($query);
+                  ?>
+                  <a class="dropdown-toggle" data-toggle="dropdown">Cheque Notification<i class="fa fa-bell-o"></i> <span id="UnReadNotify" style="color: red;font-weight: 800;"><?php echo $total; ?></span></a>
+                  <ul class="dropdown-menu list-group-flush list-group" id="notification" style="height: 320px;width: 290px;overflow-x: scroll;">
+              <?php   
+                 while($row = $query->fetch_assoc()){
+                   echo "
+                       <li   class='list-group-item' style =' background-color:#F4F4F0; margin-top:2px'> <strong>Cheque no </strong>".$row['cheque_no']."  <strong> will Place on: </strong> ".$row['cheque_date']."</li> 
+                   ";
+                 }
+                ?>
+              </ul>
             </li>
             <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">

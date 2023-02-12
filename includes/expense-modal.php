@@ -2,17 +2,19 @@
 <div class="modal fade" id="addExpense-modal">
     <div class="modal-dialog" style="width:45%;">
         <div class="modal-content">
-            <div class="modal-header float-left">
-                <h4 class="modal-title float-left"> Add Expense</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
-            </div> 
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><b>Add Expense</b></h4>
+            </div>
             <div class="modal-body">
                     <form class="form-horizontal" id="form_addExpenses" method="POST" action="#" enctype="multipart/form-data">
                         <div class="form-group row">
                         <div class="col-md-4">
                             
                                 <label for="ItemName">Expanse Date</label> 
-                                <input type="Date" class="form-control" id="expenseDate" name="expenseDate" placeholder="Enter Expense Date">
+                                <input type="Date" value="<?php echo date('Y-m-d');?>" class="form-control" id="expenseDate" name="expenseDate" placeholder="Enter Expense Date">
                             </div>
                             <div class="col-md-8">
                                 <label for="productCode">Expense Reason</label> 
@@ -58,13 +60,7 @@
                                 <label for="minPrice">Amount</label> 
                                 <input type="Number" class="form-control" id="amount" name="amount" onblur="MinimumNValidate()" placeholder="Enter Amount">
                             </div>
-                            <div class="col-sm-6">
-                                <label for="status">Status</label> 
-                                <select id="status" name="status" class="form-control input-sm">
-                                    <option value="No"> Active </option>
-                                    <option value="Yes"> Inactive</option>
-                                </select>
-                            </div>
+                           
                         </div>
                         
             

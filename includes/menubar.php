@@ -302,19 +302,20 @@
                 </ul>
             </li>
             <?php } ?>
-            <!--li class="treeview">
+            <li class="treeview">
                 <a href="#">
-                    <i class="fa fa-users"></i>
-                    <span>Calendar Activities</span>
+                    <i class="fa fa-hand-o-right"></i>
+                    <span>Calendar Management</span>
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                 </a>
                 <ul class="treeview-menu">
+                    <li><a href="view.php"><i class="fa fa-calendar"></i> <span>Create Calendar</span></a></li>
                     <li><a href="calendar-view.php"><i class="fa fa-calendar"></i> <span>Full Calendar</span></a></li>
-                    <li><a href="onday-view.php"><i class="fa fa-calendar"></i> <span>Working Calendar</span></a></li>
+                    <li><a href="onday-view.php"><i class="fa fa-calendar"></i> <span>Onday Calendar</span></a></li>
                     <li><a href="offday-view.php"><i class="fa fa-calendar"></i> <span>Offday Calendar</span></a></li>
                     <li><a href="holiday-view.php"><i class="fa fa-calendar"></i> <span>Holiday Calendar</span></a></li>
                 </ul>
-            </li-->
+            </li>
         </ul>
     </section>
     <!-- /.sidebar -->

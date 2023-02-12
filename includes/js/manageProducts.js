@@ -211,7 +211,7 @@ var output1 = document.getElementById('editViewImage');
 						specificationHTML = "<tr><td class='col-sm-6'><input type='text' class='col-sm-6 form-control' name='spacName[]' placeholder='Name' value='' /></td><td class='col-sm-6'><input type='text' class='form-control' name='spacValue[]' placeholder='value' value='' /></td><td><button type='button' name='add' id='add' class='btn btn-success btn-sm add'><span class='glyphicon glyphicon-plus'></span></button></td></tr>";
 						$("#dynamic_field").html(specificationHTML);
 					}
-				},error: function (xhr) {
+				},error: function (xhr){
 					alert(xhr.responseText);
 				}
 			  });

@@ -2,10 +2,11 @@
 <div class="modal fade" id="addExpenseType">
     <div class="modal-dialog" style="width:35%;">
         <div class="modal-content">
-            <div class="modal-header float-left">
-                <h4 class="modal-title float-left"> Add ExpenseType</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
-            </div> 
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><b>Add ExpenseType</b></h4>
+            </div>
             <div class="modal-body">
                 <form id="expenseTypeForm" method="POST" enctype="multipart/form-data" action="#">
 

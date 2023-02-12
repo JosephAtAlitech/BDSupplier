@@ -121,7 +121,7 @@ if (isset($_POST['savePurchase'])) {
 	$dueAmount = $_POST['dueAmount'];
 	$discount = $_POST['discount'];
 	$purchaseCode = 0;
-
+	
 	try {
 		$conn->begin_transaction();
 		$sql = "SELECT LPAD(max(purchaseOrderNo)+1, 6, 0) as purchaseCode from tbl_purchase";

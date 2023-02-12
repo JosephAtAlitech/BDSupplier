@@ -77,8 +77,6 @@ if(isset($_GET['page'])){
         } else {
             json_encode($conn->error);;
         }
-        
-        
     }
 else{
     /* Display Data from Expense type table */
