@@ -78,18 +78,23 @@ function deleteEntryCheque(id){
 	}
 }
 
-function deletePlacement(id, chequeId, chequeNo){
-	var conMsg = confirm("Are you sure to delete??")
+function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeStatus){
+	var conMsg = confirm("Are you sure to delete??");
 	if(conMsg){
 		var Id = id;
 		var chequeId = chequeId;
 		var chequeNo = chequeNo;
-
+		var bankAccountId = bankAccountId;
+        var chequeStatus =chequeStatus;
+		var amount = amount;
+		
 		var fd = new FormData();
 		fd.append('id',Id);
 		fd.append('chequeId',chequeId);
 		fd.append('chequeNo',chequeNo);
-		//fd.append('chequeStatus',chequeStatus);
+		fd.append('bankAccountId',bankAccountId);
+		fd.append('chequeStatus',chequeStatus);
+		fd.append('amount',amount);
 		fd.append('deletePlacement',"deletePlacement");
 		$.ajax({
 		type: 'POST',
@@ -100,6 +105,7 @@ function deletePlacement(id, chequeId, chequeNo){
 		
     		success:function(response)
     		{
+				alert(response.status);
 					$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
 				    $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 					  $(this).hide(); n();
@@ -279,6 +285,7 @@ function deletePlacement(id, chequeId, chequeNo){
 			$("#place_chequeNo").val(row.cheque_no +" - "+ row.bank_name);
 			$("#place_partyName").val(row.partyName);
 			$("#tbl_partyId").val(row.tbl_party_id);
+			$("#tbl_bank_account_id").val(row.tbl_bank_account_id);
 			$("#partyType").val(row.party_type);
 			$("#bankName").val(row.bank_name);
 			$("#amount").val(row.amount);
@@ -289,11 +296,13 @@ function deletePlacement(id, chequeId, chequeNo){
 				$("#placementDate").attr("disabled","disabled");
 				$("#chequeStatus").attr("disabled","disabled");
 				$("#bounceAndClearanceDate").attr("disabled","disabled");
+				$("#remarks").attr("disabled","disabled");
 				$(".btnattr").prop("disabled", true);
 			}else{
 				$("#placementDate").removeAttr("disabled");
 				$("#chequeStatus").removeAttr("disabled");
 				$("#bounceAndClearanceDate").removeAttr("disabled");
+				$("#remarks").removeAttr("disabled");
 				$(".btnattr").removeAttr("disabled");
 			}
 			ChequePlanement(row.id);
@@ -320,16 +329,19 @@ function ChequePlanement(id) {
 					var i=0;
 					var j=1;
 					var btn = '';
-					
+					var dumy= "dummy";
+					var status = prow[i].cheque_status;
 					for( i=0; i<prow.length; i++){
 						
-						if(prow[i].cheque_status == "Completed"){
-							  btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+prow[i].cheque_no+")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button>";
+						if(prow[i].cheque_status  ){
+							  
+							  btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+prow[i].cheque_no+","+prow[i].tbl_bank_account_id+","+prow[i].amount+",\""+status+"\")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button>";
 						}
 						else{
-							  btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+null+")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button></a>";
+							  
+							  btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+dumy+","+dumy+","+dumy+")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button></a>";
 						}
-
+						//btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+prow[i].cheque_no+","+prow[i].tbl_bank_account_id+","+prow[i].cheque_status+")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button>";
 						$("#PlacementedTableBody").append("<tr>" +
 						   " <td class='text-left'>" +  j  + "</td>" +
 						   "<td class='text-center'> " + prow[i].placement_date + "</td>" + 
@@ -337,28 +349,29 @@ function ChequePlanement(id) {
 						   "<td class='text-center status'>" + prow[i].cheque_status + "</td>" +
 						   "<td>"+btn+"</td>" +
 						   "</tr>");
-
 						   if(i==0){
 							$(".status").append("<span>     </span><i class='fa fa-circle text-green' style='font-size:9px' aria-hidden='true'></i>");
 						}
 						j++;
 					}
-					
 					if(prow[0].cheque_status == "Completed"   ){
 						$("#placementDate").attr("disabled","disabled");
 						$("#chequeStatus").attr("disabled","disabled");
 						$("#bounceAndClearanceDate").attr("disabled","disabled");
+						$("#remarks").attr("disabled","disabled");
 						$(".btnattr").prop("disabled", true);
 					}else if(prow[0].cheque_status == "Cancel"){
 						$("#placementDate").attr("disabled","disabled");
 						$("#chequeStatus").attr("disabled","disabled");
 						$("#bounceAndClearanceDate").attr("disabled","disabled");
+						$("#remarks").attr("disabled","disabled");
 						$(".btnattr").prop("disabled", true);
 					}
 					else{
 						$(".btnattr").removeAttr("disabled");
 						$("#placementDate").removeAttr("disabled");
 			        	$("#chequeStatus").removeAttr("disabled");
+						$("#remarks").removeAttr("disabled");
 			         	$("#bounceAndClearanceDate").removeAttr("disabled");
 					}
 				manageEntryChequeTable.ajax.reload(null, false);
@@ -407,8 +420,10 @@ function ChequePlanement(id) {
 		var bankName = $("#bankName").val();
 		var amount = $("#amount").val();
 		var chequeStatus = $("#chequeStatus").val();
+		var bankAccountId = $("#tbl_bank_account_id").val();
 		var bounceAndClearanceDate = $("#bounceAndClearanceDate").val();
-	
+		var remarks = $("#remarks").val();
+	  
 			var fd = new FormData();
 			fd.append('saveChequePlacement',"saveChequePlacement");
 			fd.append('chequeId',chequeId);
@@ -421,7 +436,9 @@ function ChequePlanement(id) {
 			fd.append('chequeDate',chequeDate);
 			fd.append('placementDate',placementDate);
 			fd.append('chequeStatus',chequeStatus);
+			fd.append('bankAccountId',bankAccountId);
 			fd.append('bounceAndClearanceDate',bounceAndClearanceDate);
+			fd.append('remarks',remarks);
 			$.ajax({
 				type: 'POST',
 				url: 'phpScripts/manageChequeModule.php',

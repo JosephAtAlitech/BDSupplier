@@ -14,14 +14,15 @@ if (isset($_POST['addBankAccount'])) {
     $branchName = $_POST['branchName'];
     $swiftCode = $_POST['swiftCode'];
     $address = $_POST['address'];
+    $openingBalance = $_POST['openingBalance'];
     $sql = "SELECT id 
             FROM tbl_bank_account_info
             WHERE accountNo='$accountNo'
             AND deleted='No'";
     $result = $conn->query($sql);
     if($result->num_rows == 0){
-        $sql = "INSERT INTO tbl_bank_account_info (accountNo, accountName, createdBy, bankName, branchName, swiftCode, address,createdDate) 
-                VALUES ('$accountNo', '$accountName', '$loginID', '$bankName', '$branchName', '$swiftCode', '$address','$toDay')";
+        $sql = "INSERT INTO tbl_bank_account_info (accountNo, accountName, createdBy, bankName, branchName, swiftCode, address, opening_balance,current_balance, createdDate) 
+                VALUES ('$accountNo', '$accountName', '$loginID', '$bankName', '$branchName', '$swiftCode', '$address','$openingBalance','$openingBalance','$toDay')";
 	    if($conn->query($sql)){
             echo json_encode('Success');	        
 	    }else{

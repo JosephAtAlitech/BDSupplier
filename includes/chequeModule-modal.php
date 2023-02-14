@@ -1,49 +1,44 @@
 <!-- Add Cheque Entry-->
 <div class="modal fade" id="entryNewCheque">
-    <div class="modal-dialog" style="width: 55%;">
+    <div class="modal-dialog" style="width: 70%;">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" >
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title"><b>Cheque Entry</b></h4>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" id="form_addCheque" method="POST" action="#" enctype="multipart/form-data">
-                <div class="form-group">
-                
-                <div class="col-sm-6 ">
+            <div class="modal-body" >
+                <form id="form_addCheque" class="border border-top-0"  method="POST" action="#" enctype="multipart/form-data" >
+                <div class="row"  >
+                       <div class="col-md-4">
                             <label for="partyType">Party Type</label> 
-                            
                             <select class="form-control"  onchange="loadParty(this.value)" name="partyType" id="partyType">
 							    <option selected>Select Type </option>
 							    <option value='Customers'>Customers</option>
                                 <option value='WICustomer'>WICustomer</option>		
                             </select>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="form-group col-md-4">
                             <label for="partyId">Payment From [party]</label> 
                             <select class="form-control" name="partyId" id="partyId">
                                 <option selected>Select party </option>
                             </select>
                         </div>
-                        </div>
-                <div class="form-group">
-                        <div class="col-sm-6">
+                        <div class="form-group col-md-4">
                             <label for="chequeReceivingDate">Cheque Receiving Date</label> 
                             <input type="date" class="form-control" id="chequeReceivingDate" name="chequeReceivingDate" placeholder="Enter Cheque Receiving Date" value="<?php echo date('Y-m-d');?>">
                         </div>
-                        <div class="col-sm-6 ">
+                </div>
+                <div class="row">
+                       
+                        <div class="form-group col-sm-4">
                             <label for="voucherType">Voucher Type</label> 
-                            
                             <select class="form-control"   name="voucherType" id="voucherType">
                                 <option value='paymentReceivedVoucher'>Payment Received</option>		
 							    <option value='paymentVoucher'>Payment</option>
                             </select>
                         </div>
-                        
-                    </div>
-                    <div class="form-group">
-                    <div class="col-sm-6">
+                        <div class="form-group col-sm-4">
                             <label for="bankId ">Bank Name</label> 
                             <select class="form-control" name="bankId" id="bankId" >
                              
@@ -58,35 +53,36 @@
                                 ?>
                             </select>
                         </div>
-                        <!-- <div class="col-sm-6">
-                            <label for="branchId">Branch Name</label> 
-                            <select class="form-control" name="branchId" id="branchId" >
-                              
-                                <?php
-                                $sql = "SELECT id,branch_name FROM `tbl_bank_branch` WHERE deleted='No' ORDER BY `id`  DESC";
-                                $query = $conn->query($sql);
-                                while ($prow = $query->fetch_assoc()) {
-                                    echo "
-									  <option value='" . $prow['id'] . "'>" . $prow['branch_name'] . "</option>
-									";
-                                }
-                                ?>
-                            </select>
-                        </div> -->
-                        <div class="col-sm-6">
+                        <div class="form-group col-sm-4">
                             <label for="chequeType">Cheque Type</label> 
                             <select class="form-control" name="chequeType" id="chequeType">   
 							    <option value='Account pay'>Account pay</option>
                                 <option value='Account pay'>Cash Cheque</option>
                             </select>
                           </div>
-                        </div>
-                    <div class="form-group">
-                        <div class="col-sm-6">
+                </div>
+                <div class="row">
+                        
+                        <!-- <div class="col-sm-6">
+                            <label for="branchId">Branch Name</label> 
+                            <select class="form-control" name="branchId" id="branchId" >
+                                <?php
+                                // $sql = "SELECT id,branch_name FROM `tbl_bank_branch` WHERE deleted='No' ORDER BY `id`  DESC";
+                                // $query = $conn->query($sql);
+                                // while ($prow = $query->fetch_assoc()) {
+                                //     echo "
+								// 	  <option value='" . $prow['id'] . "'>" . $prow['branch_name'] . "</option>
+								// 	";
+                                // }
+                                ?>
+                            </select>
+                        </div> -->
+                        
+                        <div class="form-group col-sm-4">
                             <label for="payTo">Pay To</label>  
                             <input type="text" class="form-control" id="payTo" name="payTo" placeholder="Pay To">
                          </div>
-                         <div class="col-sm-6">
+                         <div class="form-group col-sm-4">
                             <label for="depositeAccount">Deposite Account</label> 
                             <select class="form-control" name="depositeAccount" id="depositeAccount">
                                 <?php
@@ -100,35 +96,36 @@
                                 ?>
                              </select>
                          </div>
-                        </div>
-                        <div class="form-group">
-                         
-                         	
-						 <div class="col-sm-6">
+                         <div class="form-group col-sm-4">
                             <label for="chequeNo">Cheque No</label> 
-                            <input type="text" class="form-control" id="chequeNo" value='0' autocomplete="off" name="chequeNo" placeholder="Enter Cheque No">
+                            <input type="text" class="form-control" id="chequeNo" autocomplete="off" name="chequeNo" placeholder="Enter Cheque No">
                          </div>
-                         <div class="col-sm-6">
+
+                    </div>
+                   
+                        
+					<div class="row">
+                         <div class="form-group col-md-4">
+
                             <label for="chequeDate">Cheque Placement Date</label> 
                             <input type="date" value="<?php echo date('Y-m-d');?>" class="form-control" id="chequeDate" name="chequeDate" placeholder="Enter Cheque Date">
                         </div>
-
-                        </div>
-                        <div class="form-group">
-                        
-                       
-                        <div class="col-sm-6">
+                        <div class="form-group col-md-4">
                             <label for="amount">Amount</label> 
                             <input type="text" class="form-control" id="amount" name="amount" placeholder="Enter Amount">
                         </div>
-                        <div class="col-sm-6">
-                            <label for="add_chequeImage">Cheque Image</label>  
+                        <div class="form-group col-md-4">
+                            <label for="add_chequeImage">Cheque Image [Optional]</label>  
                             <input type="file" class="form-control" id="add_chequeImage" name="chequeImage" onchange="loadFile(event);" accept=".png, .jpg, .jpeg" >
 							<img  src="images/broken_image.png" style="width: 60%;height: 110px;border-radius: 10%;margin-top: 8%;" id="output"/>
 						</div>
+                      
                         </div>
+                     
+                      
+                        
 
-                    <div class="modal-footer">
+                    <div class=" modal-footer">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
 					<button type="submit" class="btn btn-success entryBtn btn-flat" name="form_addCheque" id="form_addCheque"><i class="fa fa-save"></i> Save </button>
                     </div>
@@ -160,7 +157,8 @@
                 <input disabled type="hidden" value="" class="form-control col-sm-6" id="bankName" name="bankName" >
                 <input disabled type="hidden" value="" class="form-control col-sm-6" id="tbl_partyId" name="tbl_partyId" >
                 <input disabled type="hidden" value="" class="form-control col-sm-6" id="partyType" name="partyType" >
-                <div class="col-sm-6">
+                <input disabled type="hidden" value="" class="form-control col-sm-6" id="tbl_bank_account_id" name="tbl_bank_account_id" >
+                <div class="col-sm-7">
                 <div class="form-group">
             
             <div class="col-sm-12">
@@ -184,26 +182,31 @@
    <hr>
    
        <div class="form-group">
-           <div class="col-sm-6">
+           <div class="col-sm-4">
                <label for="placementDate">Placement date</label> 
                <input type="date" class="form-control" id="placementDate" name="placementDate" placeholder="Enter Placement Date" value="<?php echo date('Y-m-d');?>">
            </div>
-    
-           <div class="col-sm-6">
+           <div class="col-sm-4">
+                <label for="bounceAndClearanceDate">Bounce/ Clearance Date</label> 
+                <input type="date" class="form-control" id="bounceAndClearanceDate" name="bounceAndClearanceDate" placeholder="Bounce/ Clearance Date" value="<?php echo date('Y-m-d');?>">
+            </div>
+           <div class="col-sm-4">
              <label for="chequeStatus">Cheque Status</label> 
                <select class="form-control" name="chequeStatus" id="chequeStatus">
-                   <option value="" selected>~~ Select Status ~~</option>
+                   <option value='Pending'>Running</option>		
                    <option value='Bounce'>Bounce</option>
                    <option value='Completed'>Passed</option>
-                   <option value='Pending'>Running</option>		
                    <option value='Cancel'>Cancel</option>			
                </select>
             </div>
+            
            </div>
         <div class="form-group">
-            <div class="col-sm-6">
-                <label for="bounceAndClearanceDate">Bounce/ Clearance Date</label> 
-                <input type="date" class="form-control" id="bounceAndClearanceDate" name="bounceAndClearanceDate" placeholder="Bounce/ Clearance Date" value="<?php echo date('Y-m-d');?>">
+          
+     
+            <div class="col-sm-12">
+                <label for="remarks">Remarks</label> 
+                <textarea class="form-control" id="remarks" name="remarks" rows="3" ></textarea>
             </div>
         </div>
         <div class="modal-footer">
@@ -212,13 +215,13 @@
                     </div>
                     </form>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-5">
                 <table id="managePlacementedTable" class="table table-bordered" style="width:100%;">
-                            <thead>
+                            <thead style="background-color: #e1e1e1;font-size: 12px;">
                                 <th width="4%">SN</th>
                                 <th>Placement Date</th>
                                 <th>Clearance Date</th>
-                                <th>Status</th>
+                                <th width="28%">Status</th>
                                 <th width="4%">Action</th>
                             </thead>
                             <tbody id="PlacementedTableBody">

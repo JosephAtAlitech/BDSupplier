@@ -3,7 +3,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
           	<div class="modal-header">
-            	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
               		<span aria-hidden="true">&times;</span></button>
             	<h4 class="modal-title"><b>Add New Bank Account </b></h4>
           	</div>
@@ -44,6 +45,12 @@
                   	<div class="col-sm-9">
                     	<textarea type="text" class="form-control" id="add_address" name="address" placeholder=" Bank Address "></textarea>
                   	</div>
+				</div>
+				<div class="form-group">
+                  	<label for="openingBalance" class="col-sm-3 control-label">Opening balance</label>
+                  	<div class="col-sm-9">
+                    	<input type="text" class="form-control" id="openingBalance" name="openingBalance"  placeholder=" Opening Balance ">
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
@@ -111,6 +118,12 @@
 							<option value="Inactive"> In-Active </option>
 						</select>
                   	</div>
+				</div>
+				<div class="form-group">
+                  	<label for="openingBalance" class="col-sm-3 control-label">Opening balance</label>
+                  	<div class="col-sm-9">
+                    	<input type="text" value="" class="form-control" id="edit_openingBalance" name="openingBalance"  placeholder=" Opening Balance " readonly>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default btn-flat pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>

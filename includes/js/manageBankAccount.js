@@ -27,7 +27,9 @@ $(document).ready(function() {
 			  var branchName=$("#add_branchName").val();
 			  var swiftCode=$("#add_swiftCode").val();
 			  var address=$("#add_address").val();
-			  var dataString = "accountNo="+accountNo+"&accountName="+accountName+"&bankName="+bankName+"&branchName="+branchName+"&swiftCode="+swiftCode+"&address="+address+"&addBankAccount=1";
+			  var openingBalance = $("#openingBalance").val();
+			  alert(openingBalance)
+			  var dataString = "accountNo="+accountNo+"&accountName="+accountName+"&bankName="+bankName+"&branchName="+branchName+"&swiftCode="+swiftCode+"&address="+address+"&openingBalance="+openingBalance+"&addBankAccount=1";
 			  $.ajax({
 					type: 'POST',
 					url: 'phpScripts/manageBankAccount-add.php',
@@ -43,6 +45,7 @@ $(document).ready(function() {
 						   $("#add_branchName").val('');
 						   $("#add_swiftCode").val('');
 						   $("#add_address").val('');
+						   $("#openingBalance").val('');
 						   $("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
 						   $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 							  $(this).hide(); n();
@@ -168,6 +171,8 @@ function editBankAccount(bankAccountId){
           $('#edit_swiftCode').val(response.swiftCode);
           $('#edit_status').val(response.status).trigger('change');
           $('#edit_address').val(response.address);
+		  $('#edit_openingBalance').val(response.opening_balance);
+		 // alert(response.opening_balance)
         }
         ,error: function (xhr) {
             alert(xhr.responseText);

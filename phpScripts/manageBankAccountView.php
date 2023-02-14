@@ -3,7 +3,7 @@ $conPrefix = '../';
 include $conPrefix . 'includes/session.php';
 if (isset($_POST['id'])) {
     $bankAccountId=$_POST['id'];
-    $sql = "SELECT id, accountNo, accountName, bankName, branchName, swiftCode, status, address
+    $sql = "SELECT id, accountNo, accountName, bankName, branchName, swiftCode, status, address, opening_balance
             FROM tbl_bank_account_info
             WHERE deleted='No' AND id='$bankAccountId'";
     $result = $conn->query($sql);
@@ -11,7 +11,7 @@ if (isset($_POST['id'])) {
     echo json_encode($result->fetch_array());
 }
 else{
-    $sql = "SELECT id, accountNo, accountName, bankName, branchName, swiftCode, status
+    $sql = "SELECT id, accountNo, accountName, bankName, branchName, swiftCode, status, opening_balance, current_balance
             FROM tbl_bank_account_info
             WHERE deleted='No'
             order by id DESC";
@@ -35,6 +35,7 @@ else{
             $row['bankName'],
             $row['branchName'],
             $row['swiftCode'],
+            "<strong>Opening Balence: </strong>".$row['opening_balance']."<br><strong>Current Balence: </strong>".$row['current_balance'],
             $status,
             $button
         );

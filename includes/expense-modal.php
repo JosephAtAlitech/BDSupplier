@@ -16,15 +16,8 @@
                                 <label for="ItemName">Expanse Date</label> 
                                 <input type="Date" value="<?php echo date('Y-m-d');?>" class="form-control" id="expenseDate" name="expenseDate" placeholder="Enter Expense Date">
                             </div>
-                            <div class="col-md-8">
-                                <label for="productCode">Expense Reason</label> 
-                                <input type="text" class="form-control" id="expenseCause" autocomplete="off" name="expenseCause" placeholder="Enter Expense Cause" />
-                            </div>
-                
-                        </div>
-                        <div class="form-group row">
-                           
-                            <div class="col-sm-6">
+                            
+                            <div class="col-sm-8">
                             <label for="expenseType">Expense Type</label> 
                             <select class="form-control" name="expenseType" id="expenseType">
                                 <?php
@@ -38,8 +31,20 @@
                                 ?>
                             </select>
                             </div>
+                            
+                        </div>
+                        <div class="form-group row">
+                        <div class="col-md-12">
+                                <label for="productCode">Expense Reason</label> 
+                                <input type="text" class="form-control" id="expenseCause" autocomplete="off" name="expenseCause" placeholder="Enter Expense Cause" />
+                            </div>
+                
                         
-                            <div class="col-sm-6">
+                            
+                            
+                        </div>
+                        <div class="form-group row">
+                        <div class="col-sm-6">
                                 <label for="expenseBy">Expense By</label> 
                                 <select class="form-control" name="expenseBy" id="expenseBy" >
                                     <?php
@@ -53,12 +58,9 @@
                                     ?>
                                 </select>
                             </div>
-                            
-                        </div>
-                        <div class="form-group row">
                             <div class="col-sm-6">
                                 <label for="minPrice">Amount</label> 
-                                <input type="Number" class="form-control" id="amount" name="amount" onblur="MinimumNValidate()" placeholder="Enter Amount">
+                                <input type="text" class="form-control" id="amount" name="amount" onblur="MinimumNValidate()" placeholder="Enter Amount">
                             </div>
                            
                         </div>
