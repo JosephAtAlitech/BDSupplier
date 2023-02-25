@@ -434,11 +434,18 @@ if (isset($_POST["action"])) {
 						$sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_sales_id, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType, voucherNo,customerType,entryDate) 
         							VALUES ('$customerId', '$salesId', '$grandTotal', '$loginID', '$paymentMethod', '$salesDate', 'Active', 'Payable for Walkin Sales Code: $salesOrderNo', 'partyPayable', 'WalkinSale', '$voucherNo', '$customerType','$toDay')";
 						$conn->query($sql);
+						
 						//}
 						if ($paidAmount > 0) {
 							$sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_sales_id, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType, voucherNo, customerType,entryDate) 
         							VALUES ('$customerId', '$salesId', '$paidAmount', '$loginID', '$paymentMethod', '$salesDate', 'Active', 'payment for Walkin Sales Code: $salesOrderNo', 'paymentReceived', 'WalkinSale', '$voucherReceiveNo', '$customerType','$toDay')";
 							$conn->query($sql);
+
+							//Add current balance
+							if($conn->query($sql)){
+								$sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $paidAmount WHERE methodName = 'CASH' ";
+								$conn->query($sql2);
+							}
 						}
 
 						// Start Insert Sale Serialize Product
@@ -572,63 +579,71 @@ if (isset($_POST["action"])) {
 		} else {
 			try {
 				$loginID = $_SESSION['user'];
-				$sql = "SELECT tbl_productsId, tbl_wareHouseId, quantity 
-                        FROM tbl_sales_products 
-                        WHERE tbl_salesId='$id' AND deleted='No'";
+				$sql = "SELECT  tbl_sales_products.*, tbl_sales.paidAmount
+						FROM tbl_sales_products 
+						left join tbl_sales on tbl_sales_products.tbl_salesId = tbl_sales.id
+						WHERE tbl_salesId='$id' AND tbl_sales_products.deleted='No'";
 				$resultSalesProducts = $conn->query($sql);
 				$conn->begin_transaction();
 				$sql = "UPDATE tbl_paymentVoucher 
                         set deleted='Yes', deletedBy='$loginID', deletedDate='$toDay'
                         WHERE tbl_sales_id='$id' AND voucherType='WalkinSale'";
 				$conn->query($sql);
-				while ($row = $resultSalesProducts->fetch_assoc()) {
-					$quantity = $row['quantity'];
-					$tbl_productsId = $row['tbl_productsId'];
-					$tbl_wareHouseId = $row['tbl_wareHouseId'];
-					$sql = "UPDATE tbl_currentStock 
-                            SET currentStock = currentStock+$quantity, salesDelete = salesDelete+$quantity, lastUpdatedDate='$toDay', lastUpdatedBy='$loginID' 
-                            WHERE tbl_productsId='$tbl_productsId' AND tbl_wareHouseId='$tbl_wareHouseId' AND deleted='No'";
-					$conn->query($sql);
-				}
+				
+				$row = $resultSalesProducts->fetch_assoc();
+				$paidAmount = $row['paidAmount'];
+				$quantity = $row['quantity'];
+				$tbl_productsId = $row['tbl_productsId'];
+				$tbl_wareHouseId = $row['tbl_wareHouseId'];
+				$sql = "UPDATE tbl_currentStock 
+						SET currentStock = currentStock+$quantity, salesDelete = salesDelete+$quantity, lastUpdatedDate='$toDay', lastUpdatedBy='$loginID' 
+						WHERE tbl_productsId='$tbl_productsId' AND tbl_wareHouseId='$tbl_wareHouseId' AND deleted='No'";
+				$conn->query($sql);
+				
+				// Subtract Current ballance
+				
+				$sql2= "UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $paidAmount WHERE methodName = 'CASH'";
+				$conn->query($sql2);
+				
 				$sql = "UPDATE tbl_sales_products 
                         SET deleted='Yes', deletedBy='$loginID', deletedDate='$toDay' 
                         WHERE tbl_salesId='$id' AND deleted='No'";
 				if ($conn->query($sql)) {
 
 					//====================== Start Serialize Product Delete ======================//
-					$sql = "SELECT tbl_serialize_products_id, sale_quantity 
-							FROM sale_serialize_products 
-							WHERE sale_id='$id' AND deleted='No'";
-					$resultSaleSerializeProducts = $conn->query($sql);
-					$k = 0;
-					while ($row = $resultSaleSerializeProducts->fetch_assoc()) {
-						$tbl_serialize_products_id = $row['tbl_serialize_products_id'];
-						$sale_quantity = intval($row['sale_quantity']);
-						// Update
-						$serialize_update_sql = "UPDATE tbl_serialize_products 
-												 SET used_quantity=used_quantity-$sale_quantity, is_sold='ON', updated_by='$loginID', updated_date='$toDay'
-												 WHERE id='$tbl_serialize_products_id' AND deleted='No'";
-						$conn->query($serialize_update_sql);
-						// End Update
-						$k++;
-					}
-					// Delete
-					$serialize_sale_delete_sql = "UPDATE sale_serialize_products
-												  SET deleted='Yes', deleted_by='$loginID', deleted_date='$toDay' 
-												  WHERE sale_id='$id' AND deleted='No'";
-					$conn->query($serialize_sale_delete_sql);
-					// End Delete
-					//====================== End Serialize Product Delete ======================//
+				$sql = "SELECT tbl_serialize_products_id, sale_quantity 
+						FROM sale_serialize_products 
+						WHERE sale_id='$id' AND deleted='No'";
+				$resultSaleSerializeProducts = $conn->query($sql);
+				$k = 0;
+				while ($row = $resultSaleSerializeProducts->fetch_assoc()) {
+					$tbl_serialize_products_id = $row['tbl_serialize_products_id'];
+					$sale_quantity = intval($row['sale_quantity']);
+					// Update
+					$serialize_update_sql = "UPDATE tbl_serialize_products 
+												SET used_quantity=used_quantity-$sale_quantity, is_sold='ON', updated_by='$loginID', updated_date='$toDay'
+												WHERE id='$tbl_serialize_products_id' AND deleted='No'";
+					$conn->query($serialize_update_sql);
+					// End Update
+					$k++;
+				}
+				// Delete
+				$serialize_sale_delete_sql = "UPDATE sale_serialize_products
+												SET deleted='Yes', deleted_by='$loginID', deleted_date='$toDay' 
+												WHERE sale_id='$id' AND deleted='No'";
+				$conn->query($serialize_sale_delete_sql);
+				// End Delete
+				//====================== End Serialize Product Delete ======================//
 
-					$sql = "UPDATE tbl_sales 
-                            SET deleted='Yes', deletedBy='$loginID', deletedDate='$toDay'
-                            WHERE id='$id'";
-					if ($conn->query($sql)) {
-						$conn->commit();
-						echo json_encode('Success');
-					} else {
-						echo json_encode('Error: ' . $conn->error());
-					}
+				$sql = "UPDATE tbl_sales 
+						SET deleted='Yes', deletedBy='$loginID', deletedDate='$toDay'
+						WHERE id='$id'";
+				if ($conn->query($sql)) {
+					$conn->commit();
+					echo json_encode('Success');
+				} else {
+					echo json_encode('Error: ' . $conn->error());
+				}
 				} else {
 					echo json_encode('Error: ' . $conn->error());
 				}

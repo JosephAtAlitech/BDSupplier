@@ -4,8 +4,10 @@ var manageEntryChequeTable;
 // retrive entry cheque data
 
 $(document).ready(function() {
+	var date= $('#sortData').val();
+	let filter = "Date@"+date;
 	manageEntryChequeTable = $("#manageEntryChequeTable").DataTable({
-		'ajax': 'phpScripts/manageChequeModule.php?type='+type,
+		'ajax': 'phpScripts/manageChequeModule.php?filter='+filter,
 		'order': [],
 		'dom': 'Bfrtip',
         'buttons': [
@@ -18,10 +20,16 @@ $(document).ready(function() {
 	});
 });
 function loadChequeEntry(type){
-	
-	manageEntryChequeTable.ajax.url('phpScripts/manageChequeModule.php?type='+type).load();
+	let filter = "Status@"+type;
+	manageEntryChequeTable.ajax.url('phpScripts/manageChequeModule.php?filter='+filter).load();
 	
 }
+function loadChequeEntrySortData(sortData){
+	let filter = "Date@"+sortData;
+	manageEntryChequeTable.ajax.url('phpScripts/manageChequeModule.php?filter='+filter).load();
+	
+}
+
 function loadParty(partyType){
 		var fd = new FormData();
 		fd.append('partyType',partyType);
@@ -39,7 +47,6 @@ function loadParty(partyType){
 				let TempParty = '';
 				for(var i=0; i<data.length; i++){
 					TempParty += "<option value='"+data[i].id+"'>"+data[i].partyName+"</option>";
-					
 				}
 				$('#partyId').append(TempParty).trigger('change');
     		},error: function (xhr) {
@@ -78,7 +85,7 @@ function deleteEntryCheque(id){
 	}
 }
 
-function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeStatus){
+function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeStatus,chequeType){
 	var conMsg = confirm("Are you sure to delete??");
 	if(conMsg){
 		var Id = id;
@@ -87,6 +94,7 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 		var bankAccountId = bankAccountId;
         var chequeStatus =chequeStatus;
 		var amount = amount;
+		var chequeType = chequeType;
 		
 		var fd = new FormData();
 		fd.append('id',Id);
@@ -95,6 +103,7 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 		fd.append('bankAccountId',bankAccountId);
 		fd.append('chequeStatus',chequeStatus);
 		fd.append('amount',amount);
+		fd.append('chequeType',chequeType);
 		fd.append('deletePlacement',"deletePlacement");
 		$.ajax({
 		type: 'POST',
@@ -105,7 +114,6 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 		
     		success:function(response)
     		{
-				alert(response.status);
 					$("#divMsg").html("<strong><i class='icon fa fa-check'></i>Success ! </strong> Successfully Saved");
 				    $("#divMsg").show().delay(2000).fadeOut().queue(function(n) {
 					  $(this).hide(); n();
@@ -191,12 +199,16 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 						$("#chequeNo").val("");
 						$("#chequeDate").val("");
 					    $("#amount").val("");
+						$('#entryNewCheque').modal('hide');
+					}else{
+						alert(response);
+						$("#chequeNo").val("");
 					}
 				},error: function (xhr) {
 					alert(xhr.responseText);
 				}
 			  });
-			$('#entryNewCheque').modal('hide');
+			
 		},
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -205,12 +217,30 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
         },
 		excluded: [':disabled'],
         fields: {
-			amount: {
+			partyType: {
 				validators: {
 					
+					 required: true 
+				}
+			},
+			partyId: {
+				validators: {
+					
+					 required: true 
+				}
+			},
+				
+			amount: {
+				validators: {
+					notEmpty: {
+						message: 'Please Insert Cheque No'
+					},
+				
+					
 					regexp: {
-						regexp: /^[0-9]+$/,
-						message: 'Only Amount : Ex. 200 '
+						
+						regexp: /^[1-9]\d*(\.\d+)?$/,
+						message: 'Only Amount : Ex. 200 mor 200.00 '
 					}
 				}
 			},
@@ -219,6 +249,7 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 				validators: {
 						stringLength: {
 						min: 1,
+						max: 12
 					},
 						notEmpty: {
 						message: 'Please Insert Cheque No'
@@ -229,7 +260,6 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 					}
 				}
 			},
-				
 			payTo: {
 					validators: {
 							stringLength: {
@@ -291,6 +321,7 @@ function deletePlacement(id, chequeId, chequeNo, bankAccountId,amount, chequeSta
 			$("#amount").val(row.amount);
 			$("#place_receivingDate").val(row.cheque_receiving_date);
 			$("#place_chequeDate").val(row.cheque_date);
+			$("#chequeType").val(row.chequeType);
 
 			if(row.status == "Completed"){
 				$("#placementDate").attr("disabled","disabled");
@@ -335,7 +366,7 @@ function ChequePlanement(id) {
 						
 						if(prow[i].cheque_status  ){
 							  
-							  btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+prow[i].cheque_no+","+prow[i].tbl_bank_account_id+","+prow[i].amount+",\""+status+"\")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button>";
+							  btn = "<button onclick='deletePlacement("+prow[i].id +","+prow[i].tbl_cheque_id+","+prow[i].cheque_no+","+prow[i].tbl_bank_account_id+","+prow[i].amount+",\""+status+"\",\""+prow[i].chequeType+"\")' class='btn ml-3 btn-danger btn-sm btn-space btn-flat'><i class='fa fa-trash'></i> </button>";
 						}
 						else{
 							  
@@ -387,7 +418,16 @@ function ChequePlanement(id) {
 
 
 	
-
+// $("#chequeType").change(function(){
+// 	var type = $("#chequeType").val();
+// 	if(type=="Cash Cheque"){
+// 		$("#depositeAccount").attr("Disabled","disabled");
+// 		$('#depositeAccount').val('').trigger('change');
+// 	}else{
+// 		$("#depositeAccount").removeAttr("disabled");
+// 		$('#depositeAccount').trigger('change');
+// 	}
+//   });
 
 	$("#partyId").select2( {
 		placeholder: "~~ Select party ~~",
@@ -455,6 +495,7 @@ function ChequePlanement(id) {
 						});
 						$(".btnattr").removeAttr("disabled");
 						ChequePlanement(chequeId);
+						$("#remarks").val('');
 						manageEntryChequeTable.ajax.reload(null, false);
 					}
 				},error: function (xhr) {

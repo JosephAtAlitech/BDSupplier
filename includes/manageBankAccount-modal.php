@@ -122,7 +122,8 @@
 				<div class="form-group">
                   	<label for="openingBalance" class="col-sm-3 control-label">Opening balance</label>
                   	<div class="col-sm-9">
-                    	<input type="text" value="" class="form-control" id="edit_openingBalance" name="openingBalance"  placeholder=" Opening Balance " readonly>
+                    	<input type="text" value="" class="form-control" id="edit_openingBalance" name="openingBalance"  placeholder=" Opening Balance " 
+						>
 					</div>
 				</div>
 				<div class="modal-footer">

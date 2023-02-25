@@ -166,8 +166,8 @@
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="expenseType-view.php?id=0"><i class="fa fa-bars"></i> <span>Expense Type</span></a></li>
-                    <li><a href="expenses-view.php?page=Expenses"><i class="fa fa-bars"></i> <span>Expenses</span></a></li>
+                    <li><a href="expenseType-view.php?"><i class="fa fa-bars"></i> <span>Expense Type</span></a></li>
+                    <li><a href="expenses-view.php?"><i class="fa fa-bars"></i> <span>Expenses</span></a></li>
                     <li><a href="dailyReport-view.php"><i class="fa fa-file-pdf-o"></i> <span>Expense Report</span></a></li>
                     <li><a href="gererateExpenseReport-view.php"><i class="fa fa-file-pdf-o"></i> <span> Gererate Expense Report</span></a></li>
                 

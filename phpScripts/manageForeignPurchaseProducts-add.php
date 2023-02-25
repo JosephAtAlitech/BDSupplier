@@ -3,7 +3,7 @@ $conPrefix = '../';
 include $conPrefix . 'includes/session.php';
 
 date_default_timezone_set('Asia/Dhaka');
-$toDay = (new DateTime($test))->format("Y-m-d H:i:s");
+$toDay = (new DateTime())->format("Y-m-d H:i:s");
 
 // add customer
 if (isset($_POST['saveForeignPurchaseProducts'])) {
@@ -191,6 +191,13 @@ if (isset($_POST['saveForeignPurchase'])) {
                             $sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_purchaseId, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType, voucherNo, customerType) 
 									VALUES ('$supplier', '$purchaseId', '$paidAmount', '$loginID', 'Cash', 'CURDATE()', 'Active', 'payment for Foreign Purchase Code: $purchaseCode', 'payment', 'Foreign Purchase', '$voucherReceiveNo', $customerType)";
                             $conn->query($sql);
+
+                            
+							//Add current balance
+							if($conn->query($sql)){
+								$sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $paidAmount WHERE methodName = 'CASH' ";
+								$conn->query($sql2);
+							}
                         }
                         if ($totalAmount > 0) {
                             $sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_purchaseId, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType) 
@@ -325,6 +332,17 @@ if (isset($_POST['deleteForeignPurchase'])) {
         $conn->begin_transaction();
         $sql = "UPDATE tbl_paymentVoucher set deleted='Yes', deletedBy='$loginID', deletedDate='$toDay' WHERE tbl_purchaseId='$id' AND voucherType='Foreign Purchase'";
         $conn->query($sql);
+        
+        $sql ="SELECT paidAmount FROM `tbl_purchaseForeign` WHERE id ='$id' AND deleted='No' AND status = 'Active' ";
+		$data = $conn->query($sql);
+		$paid= $data->fetch_assoc();
+		$paidAmount = $paid['paidAmount'];
+
+        //Update current balance for delete purchase
+        if($conn->query($sql)){
+            $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $paidAmount WHERE methodName = 'CASH' ";
+            $conn->query($sql2);
+        }
         $sql = "SELECT tbl_productsId, tbl_wareHouseId, quantity FROM `tbl_purchaseForeignProducts` WHERE tbl_purchaseForeignId='$id' AND deleted='No'";
         $query = $conn->query($sql);
         while ($row = $query->fetch_assoc()) {

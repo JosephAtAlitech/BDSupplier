@@ -21,6 +21,7 @@ if (isset($_POST['saveTemporaryPurchaseProducts'])) {
 	if (isset($_POST['sessionId'])) {
 		$sessionId = $_POST['sessionId'];
 		// 1. First try to upadate the temp purchase products
+
 		$sql = "UPDATE tbl_tempPurchaseProducts 
                 SET 
                     quantity=quantity+$quantity, 
@@ -194,6 +195,11 @@ if (isset($_POST['savePurchase'])) {
 							$sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_purchaseId, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType, voucherNo, customerType) 
 									VALUES ('$supplier', '$purchaseId', '$paidAmount', '$loginID', 'Cash', '$purchaseDate', 'Active', 'payment for Purchase Code: $purchaseCode', 'payment', 'Local Purchase', '$voucherReceiveNo', '$customerType')";
 							$conn->query($sql);
+							// Update current balance
+							if($conn->query($sql)){
+								$sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $paidAmount WHERE methodName = 'CASH' ";
+								$conn->query($sql2);
+							}
 						}
 
 						$conn->commit();
@@ -349,6 +355,10 @@ if (isset($_POST['deletePurchase'])) {
 	try {
 		$id = $_POST['id'];
 		$loginID = $_SESSION['user'];
+		$sql ="SELECT paidAmount FROM `tbl_purchase` WHERE id ='$id' AND deleted='No' AND status = 'Active' ";
+		$data = $conn->query($sql);
+		$paid= $data->fetch_assoc();
+		$paidAmount = $paid['paidAmount'];
 		$sql = "SELECT id 
                 FROM tbl_purchase_return
                 WHERE tbl_purchaseId = '$id' and deleted='No'";
@@ -357,6 +367,11 @@ if (isset($_POST['deletePurchase'])) {
 			$conn->begin_transaction();
 			$sql = "UPDATE tbl_paymentVoucher set deleted='Yes', deletedBy='$loginID', deletedDate='$toDay' WHERE tbl_purchaseId='$id' AND voucherType='Local Purchase'";
 			$conn->query($sql);
+			//Update current balance for delete purchase
+			if($conn->query($sql)){
+				$sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $paidAmount WHERE methodName = 'CASH' ";
+				$conn->query($sql2);
+			}
 			$sql = "SELECT tbl_productsId, tbl_wareHouseId, quantity FROM tbl_purchaseProducts WHERE tbl_purchaseId='$id' AND deleted='No'";
 			$query = $conn->query($sql);
 			while ($row = $query->fetch_assoc()) {
@@ -477,7 +492,7 @@ if (isset($_POST['action'])) {
         print_r($serialNumbers);
         if ($_SESSION["purchase_cart_array"] != null) {
             print_r($_SESSION["purchase_cart_array"]);
-			foreach($_SESSION["purchase_cart_array"] as $keys => $values) {
+			foreach($_SESSION["purchase_cart_array"] as $keck_out_carteys => $values) {
 			    $data .= 'Ok';
 				if ($_SESSION["purchase_cart_array"][$keys]['product_id'] == $id && $_SESSION["purchase_cart_array"][$keys]['warehouse_id'] == $warehouseId) {
 					// Serialize Product

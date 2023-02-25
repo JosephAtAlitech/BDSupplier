@@ -28,7 +28,7 @@ $(document).ready(function() {
 			  var swiftCode=$("#add_swiftCode").val();
 			  var address=$("#add_address").val();
 			  var openingBalance = $("#openingBalance").val();
-			  alert(openingBalance)
+	
 			  var dataString = "accountNo="+accountNo+"&accountName="+accountName+"&bankName="+bankName+"&branchName="+branchName+"&swiftCode="+swiftCode+"&address="+address+"&openingBalance="+openingBalance+"&addBankAccount=1";
 			  $.ajax({
 					type: 'POST',
@@ -37,7 +37,7 @@ $(document).ready(function() {
 					dataType: 'json',
 					success: function(response){
 						if(response=='Success'){
-						    $('#addnew').modal('hide');
+						   $('#addnew').modal('hide');
 						   manageBankAccountTable.ajax.reload(null, false);
 						   $("#add_accountNo").val('');
 						   $("#add_accountName").val('');
@@ -151,7 +151,7 @@ $(document).ready(function() {
 
 /*----------------Start Edit Bank Account Incormation---------------*/
 function editBankAccount(bankAccountId){
-    $('#editBankAccount').modal('show');
+  
     var dataString = "id="+bankAccountId;
     $.ajax({
         type: 'POST',
@@ -163,6 +163,7 @@ function editBankAccount(bankAccountId){
             $("#editLoader").show();
        },
         success: function(response){
+			$('#editBankAccount').modal('show');
           $('#bankAccountId').val(response.id);
           $('#edit_accountNo').val(response.accountNo);
           $('#edit_accountName').val(response.accountName);
@@ -172,7 +173,15 @@ function editBankAccount(bankAccountId){
           $('#edit_status').val(response.status).trigger('change');
           $('#edit_address').val(response.address);
 		  $('#edit_openingBalance').val(response.opening_balance);
-		 // alert(response.opening_balance)
+		  if(response.opening_balance  == 0.00){
+			$("#edit_openingBalance").removeAttr("disabled");
+			$("#edit_openingBalance").val("");
+		  }else if(response.opening_balance > 0 ){
+			$("#edit_openingBalance").attr("disabled","disabled");
+		  }else{
+			$("#edit_openingBalance").attr("disabled","disabled");
+		  }
+		
         }
         ,error: function (xhr) {
             alert(xhr.responseText);
@@ -201,7 +210,8 @@ function editBankAccount(bankAccountId){
 			  var address=$("#edit_address").val();
 			  var id = $("#bankAccountId").val();
 			  var status = $("#edit_status").val();
-			  var dataString = "accountNo="+accountNo+"&accountName="+accountName+"&bankName="+bankName+"&branchName="+branchName+"&swiftCode="+swiftCode+"&address="+address+"&status="+status+"&id="+id+"&updateBankAccount=1";
+			  var openingBalance = $("#edit_openingBalance").val();
+			  var dataString = "accountNo="+accountNo+"&accountName="+accountName+"&bankName="+bankName+"&branchName="+branchName+"&swiftCode="+swiftCode+"&address="+address+"&status="+status+"&openingBalance="+openingBalance+"&id="+id+"&updateBankAccount=1";
 		  $.ajax({
 				type: 'POST',
 				url: 'phpScripts/manageBankAccount-add.php',

@@ -7,27 +7,32 @@
 	$year = date('Y');
     
 
-    $sql = "SELECT * from daily_reports where deleted= 'No' AND status='Active' ORDER BY ID DESC LIMIT 1";
+    $sql = "SELECT * from daily_reports where deleted= 'No' ORDER BY id DESC LIMIT 1";
     $result = $conn->query($sql);
    
     if ($result) {
         $row = $result->fetch_assoc();
-        $date = $row['date'];
-        // echo $date;
+        echo $date = $row['date'];
 
-        $checkTransaction = "SELECT DISTINCT tbl_paymentvoucher.paymentDate 
+        $checkTransaction ="SELECT DISTINCT tbl_paymentvoucher.paymentDate 
+                            from tbl_paymentvoucher 
+                            where tbl_paymentvoucher.deleted = 'No' 
+                            AND tbl_paymentvoucher.paymentDate >'$date'
+                            AND tbl_paymentvoucher.status = 'Active' 
+                            GROUP BY paymentDate";
+        /* $checkTransaction = "SELECT DISTINCT tbl_paymentvoucher.paymentDate 
            from tbl_paymentvoucher
            join daily_reports on tbl_paymentvoucher.paymentDate != daily_reports.date
            where tbl_paymentvoucher.deleted = 'No'
            AND tbl_paymentvoucher.paymentDate > $date
-           AND tbl_paymentvoucher.status = 'Active'";
+           AND tbl_paymentvoucher.status = 'Active'"; */
         $result2 = $conn->query($checkTransaction);
         $dateArray = [];
         $i = 0;
         //var_dump($result2);
         while ($row2 = $result2->fetch_array()) {
-           $dateArray[$i] = $row2['paymentDate']; // store previous not closing date(s)
-           $i++;
+            $dateArray[$i] = $row2['paymentDate']; // store previous not closing date(s)
+            $i++;
         }
         // end check preious days report saved or not//
 
@@ -74,14 +79,13 @@
 							    <div class="col-md-2">
                                     <?php
                                 foreach ($dateArray as $date){ ?>
-                                                <input type="hidden"  placeholder="yyyy-mm-dd" class="form-control" id="remainingDate"
-                                                    name="remainingDate" value=" <?php echo $date; ?>" disabled>
+                                                <input type="hidden" id="remainingDate" name="remainingDate" value=" <?php echo $date; ?>" disabled>
                                 <?php } ?>
                                 </div>
 							  
     							<div class="col-md-3">
     								<label for="date" class="control-label">Select Date :</label>
-    								<input placeholder="yyyy-mm-dd" name="min" id="date" style="padding: inherit;" class="form-control datetimepicker" placeholder="Select date" name="findDate" type="date" value="<?php echo date('Y-m-d');?>" data-date-format="yyyy-mm-dd"  required/>					
+                                    <input type="date" style="line-height: 10px;" class="form-control" id="date" value="<?php echo date('Y-m-d');?>" name="date" placeholder="  " >
     							</div>
 							    <div class="col-md-1">
     								<button type="button" id="btndisplay" class="btn btn-default btn-flat pull-left" name="btndisplay" onclick="viewCalculation()" style="background-color: #3f3e93;color: #fff;margin-top: 48%;border-color: #3f3e93;"><i class="fa fa-search"></i> View Calculation </button>
@@ -93,19 +97,18 @@
 						<!--input type="submit" id="btndisplay" value="show" onclick="showMyData();"-->
 						<div id="myDiv"></div>
 					<br><br>
+                    <div id='divMsg' class='alert alert-success alert-dismissible successMessage' style="justify-content:center;"></div>
 					<div class="form-group col-md-6">
                                             <label><strong>Daily Ledger Details:</strong></label>
                                             <table  border="1" style="width:100%;">
                                                 <thead class="text-center">
                                                    <tr>
-                                                        <th>SL#</th>
-                                                        <th>Dr(-)</th>
-                                                        <th>Cr(+)</th>
+                                                        <th>Name</th>
+                                                        <th>Amount</th>
                                                     </tr> 
                                                 </thead>
                                                 <tbody class="text-center" id="manageReportTable">
-                                                    <th>Type</th>
-                                                    <th>Amount</th>
+                                                    
                                                 </tbody>
                                             </table>
                                          

@@ -414,6 +414,11 @@ if (isset($_POST["action"])) {
 						$sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_sales_id, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType, voucherNo, customerType,entryDate) 
             							VALUES ('$customers', '$salesId', '$paidAmount', '$loginID', '$paymentMethod', '$salesDate', 'Active', 'payment for Party Sales Code: $salesOrderNo', 'paymentReceived', 'PartySale', '$voucherReceiveNo', '$customerType','$toDay')";
 						$conn->query($sql);
+						// add current balance
+						if($conn->query($sql)){
+							$sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $paidAmount WHERE methodName = 'CASH' ";
+							$conn->query($sql2);
+						}
 					} else {
 						$paidAmount = 0;
 					}
@@ -1240,11 +1245,27 @@ if (isset($_POST["action"])) {
                         WHERE tbl_salesId='$id' AND deleted='No'";
 				$resultSalesProducts = $conn->query($sql);
 
+                $sql = "SELECT paidAmount
+                        FROM tbl_sales 
+                        WHERE id='$id' AND deleted='No'";
+				$saleData = $conn->query($sql);
+				$row=$saleData->fetch_assoc();
+                $paidAmount = $row['paidAmount'];
+
 				$conn->begin_transaction();
 				$sql = "UPDATE tbl_paymentVoucher 
                         set deleted='Yes', deletedBy='$loginID', deletedDate='$toDay' 
                         WHERE tbl_sales_id='$id' AND voucherType='PartySale'";
 				$conn->query($sql);
+				
+				//Update currence balance
+				if($conn->query($sql)){
+					$sql2= "UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $paidAmount WHERE methodName = 'CASH'";
+					$conn->query($sql2);
+				}
+				
+			
+
 				while ($row = $resultSalesProducts->fetch_assoc()) {
 					$quantity = $row['quantity'];
 					$tbl_productsId = $row['tbl_productsId'];

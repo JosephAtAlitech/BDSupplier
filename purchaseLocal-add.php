@@ -100,15 +100,15 @@
     						<div class="col-md-7"></div>
     						<div class="col-md-5">
                 <label for="add_discount">Discount </label> 
-    							<input type="text" min="0" value="0" class="form-control purchaseCal" id="add_discount" name="discount" required>
-
-    						<label for="add_grandTotal">Grand Total</label> 
-                <input type="hidden"  class="form-control" id="temp_grandTotal" value="0">
+    							<input type="text" min="0" value="0" class="form-control purchaseCal" id="add_discount" name="discount" required onkeyup="disCalculation()">
+                  <input type="hidden"  class="form-control" id="temp_grandTotal" value="0">
+    						
+                  <label for="add_grandTotal">Grand Total</label> 
     						
     							<input type="text"  min="0" value="0"  class="form-control" id="add_grandTotal" name="grandTotal" readonly>
     						
     						<label for="add_paid">Paid </label> 
-    							<input type="text" class="form-control purchaseCal" id="add_paid" name="paid" required>
+    							<input type="text" class="form-control purchaseCal" id="add_paid" name="paid" required onkeyup="disCalculation()">
     						
     						<label for="add_due">Due </label> 
     							<input type="text" class="form-control" id="add_due" name="due" required>

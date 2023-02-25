@@ -1012,7 +1012,6 @@ $(document).on('click', '#check_out_cart', function () {
 						} 
 						$("#offerProductWarehouse").html(offerProductWarehouseData);
 						$("#salesconfirmation").modal('show');
-
 					} else {
 						$("#divErrorMsg").html("<strong><i class='icon fa fa-trash'></i>Error ! </strong> " + data);
 						$("#divErrorMsg").show().delay(10000).fadeOut().queue(function (n) {

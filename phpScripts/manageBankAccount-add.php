@@ -43,6 +43,7 @@ if (isset($_POST['updateBankAccount'])) {
     $swiftCode = $_POST['swiftCode'];
     $address = $_POST['address'];
     $status = $_POST['status'];
+    $openingBalance = $_POST['openingBalance'];
     $sql = "SELECT id 
             FROM tbl_bank_account_info 
             where deleted='No' 
@@ -58,8 +59,10 @@ if (isset($_POST['updateBankAccount'])) {
                     bankName='$bankName', 
                     branchName='$branchName', 
                     swiftCode='$swiftCode',
+                    address='$address',
                     status='$status',
-                    address='$address'
+                    opening_balance='$openingBalance',
+                    current_balance = current_balance + '$openingBalance'
                 WHERE id = '$id'";
 	    if($conn->query($sql)){
             echo json_encode('Success');	        

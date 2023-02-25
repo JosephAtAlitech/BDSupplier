@@ -30,12 +30,13 @@ $(document).ready(function() {
                 if($('#add_discount').val() == ''){
                     $('#add_discount').val('0');
                   }
-    			var paid = parseFloat($('#add_paid').val());
-    			var grandTotal = parseFloat($('#add_grandTotal').val());
-    			$('#add_due').val(grandTotal - paid);
-    			$('#add_sessionId').val(res[2]);
-                var discount = parseFloat($('#add_discount').val());
-                $('#add_grandTotal').val(grandTotal - discount);
+    			// var paid = parseFloat($('#add_paid').val());
+    			// var grandTotal = parseFloat($('#add_grandTotal').val());
+    			// $('#add_due').val(grandTotal - paid);
+    			// $('#add_sessionId').val(res[2]);
+                // var discount = parseFloat($('#add_discount').val());
+                // $('#add_grandTotal').val(grandTotal - discount);
+                disCalculation();
 			}
 		},
 		error: function (xhr) {
@@ -58,18 +59,21 @@ function loadPurchaseProductTable(){
           var res = result.split("@!@");
           $('#managePurchaseProductTable').html(res[0]);
           $('#add_grandTotal').val(res[1]);
+          $('#temp_grandTotal').val(res[1]);
           if($('#add_paid').val() == ''){
               $('#add_paid').val('0');
           }
-        //   if($('#add_discount').val() == ''){
-        //     $('#add_discount').val('0');
-        //   }
-          
+          if($('#add_discount').val() == ''){
+            $('#add_discount').val('0');
+          }
+      
           var paid = parseFloat($('#add_paid').val());
     	  var grandTotal = parseFloat($('#add_grandTotal').val());
           $('#add_due').val(grandTotal - paid);
         //   var discount = parseFloat($('#add_discount').val());
         //   $('#add_grandTotal').val(grandTotal - discount);
+
+        disCalculation();
       },error: function (xhr) {
             alert(xhr.responseText);
         }
@@ -86,18 +90,20 @@ function loadRealPurchaseProductsTable(){
           var res = result.split("@!@");
           $('#edit_managePurchaseProductTable').html(res[0]);
           $('#edit_grandTotal').val(res[1]);
+          $('#temp_grandTotal').val(res[1]);
           if($('#edit_paid').val() == ''){
               $('#edit_paid').val('0');
           }
-        //   if($('#add_discount').val() == ''){
-        //     $('#add_discount').val('0');
-        //   }
-          
+          if($('#add_discount').val() == ''){
+            $('#add_discount').val('0');
+          }
+   
           var paid = parseFloat($('#edit_paid').val());
           var grandTotal = parseFloat($('#edit_grandTotal').val());
           $('#edit_due').val(grandTotal - paid);
-        //   var discount = parseFloat($('#add_discount').val());
-        //   $('#add_grandTotal').val(grandTotal - discount);
+          //  var discount = parseFloat($('#add_discount').val());
+          //  $('#add_grandTotal').val(grandTotal - discount);
+          disCalculation();
       },error: function (xhr) {
             alert(xhr.responseText);
         }
@@ -132,6 +138,8 @@ function deleteTemporaryPurchaseProducts(tempPurchaseProductsId){
 	}
 }
 
+
+
 //Delete Products from purchase table
 function deletePurchaseProducts(tempPurchaseProductsId){
     var conMsg = confirm("Are you sure to delete??")
@@ -158,7 +166,9 @@ function deletePurchaseProducts(tempPurchaseProductsId){
 	}
 }
 
-$('.purchaseCal').keyup(function() {
+
+
+function disCalculation() {
         var discount = parseFloat($('#add_discount').val());
         var grandTotal = parseFloat($('#temp_grandTotal').val()); // Or parseInt if integers only
         var paid = parseFloat($('#add_paid').val());
@@ -172,8 +182,7 @@ $('.purchaseCal').keyup(function() {
         $('#add_grandTotal').val(grandTotal-discount);
         var grandTotal2 = grandTotal-discount;
         $('#add_due').val(grandTotal2 -paid);
-  });
-
+    }
 
   
   $('#edit_paid').keyup(function() {
@@ -402,6 +411,7 @@ function loadCustomersSuppliers(tblType){
 	  
 	  fd.append('saveTemporaryPurchaseProducts','1');
 	  let productType = $("#add_productType").val();
+    
 	  if(productType == "serialize"){
     	  var stockQuantities = new Array();
             let i = 0;
@@ -415,11 +425,11 @@ function loadCustomersSuppliers(tblType){
             var serialNumbers = $('input[id^=serialNo]').map(function(index, serialNo) {
                 return $(serialNo).val();
             }).get();
-            fd.append('productType', productType);
+         
             fd.append('serialNumbers', serialNumbers);
             fd.append('stockQuantities', stockQuantities);
 	  }
-
+      fd.append('productType', productType);
 
 	  $.ajax({
 			type: 'POST',

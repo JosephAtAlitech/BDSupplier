@@ -9,7 +9,7 @@ $date = $_GET['date'];
     //$sessionId = time().uniqid();
 $sql = "SELECT * FROM `shopSettings`"; 
 $query = $conn->query($sql);
-while($row = $query->fetch_assoc()){
+$row = $query->fetch_assoc();
 	$address=$row['address'];
 	$phone=$row['phone'];
 	$mobile=$row['mobile'];
@@ -18,7 +18,7 @@ while($row = $query->fetch_assoc()){
 	$image=$row['image'];
 	$imageWatermark=$row['imageWatermark'];
 	$addType=$row['address_type'];
-}
+
 	require_once('tcpdf/tcpdf.php');
 
 	$page_header = '<div>
@@ -83,9 +83,9 @@ class MYPDF extends TCPDF {
     $pdf->AddPage();
     $sql11 = "SELECT fname FROM `tbl_users` WHERE id='".$_SESSION['user']."'";
 			$query = $conn->query($sql11);
-			while($row123 = $query->fetch_assoc()){
-			$fname11=$row123[fname];
-			}
+			$row123 = $query->fetch_assoc();
+			$fname11=$row123['fname'];
+			
     $content = '<style>
 				.supAddress {font-size: 8px;}
 				.supAddressFont {font-size: 8px;}
@@ -95,7 +95,7 @@ class MYPDF extends TCPDF {
 		FROM `tbl_purchase`
 		LEFT JOIN tbl_party ON tbl_party.id=tbl_purchase.tbl_supplierId 
         LEFT JOIN tbl_users ON tbl_users.id=tbl_purchase.createdBy
-        WHERE tbl_purchase.id='".$id."' AND (tbl_party.tblType='Suppliers' || tbl_party.tblType='Both')";
+        WHERE tbl_purchase.id='".$_SESSION['user']."' AND (tbl_party.tblType='Suppliers' || tbl_party.tblType='Both')";
 		
 		$query = $conn->query($sql);
 		while($row = $query->fetch_assoc()){
@@ -143,7 +143,6 @@ class MYPDF extends TCPDF {
 		</table>
 		Purchase product information :<br><br>
 		<table border="1" cellspacing="0" cellpadding="3">
-		
         <tr>
         <th class="citiestd11" width="5%">SL#</th>
         <th class="citiestd11" width="25%">Particulars</th>
@@ -152,27 +151,27 @@ class MYPDF extends TCPDF {
         <th class="citiestd11" width="10%">Cash In</th>
         <th class="citiestd11" width="9%">Cash Out</th>
         <th class="citiestd11" width="9%">Balance</th>
-    </tr>';
-    $sql = " 
-select
-    tbl_paymentvoucher.*,
-    tbl_sales.grandTotal,
-    tbl_sales.paidAmount,
-    tbl_purchase.totalAmount,
-    tbl_party.partyName,
-    tbl_party.partyAddress
-FROM
-    tbl_paymentvoucher
-    left join tbl_purchase ON tbl_paymentvoucher.tbl_purchaseId = tbl_purchase.id
-    left join tbl_sales ON tbl_paymentvoucher.tbl_sales_id = tbl_sales.id
-    left join tbl_party ON tbl_paymentvoucher.tbl_partyId = tbl_party.id
-where
-    tbl_paymentvoucher.deleted = 'No'
-    AND tbl_paymentvoucher.paymentDate = '$date'
-    AND tbl_paymentvoucher.status = 'Active'
-    AND tbl_paymentvoucher.paymentMethod = 'Cash'
-    
-    AND tbl_paymentvoucher.type  IN ('payment','paymentReceive', 'partyPayable')";
+        </tr><tbody>';
+
+    $sql = " SELECT
+                tbl_paymentvoucher.*,
+                tbl_sales.grandTotal,
+                tbl_sales.paidAmount,
+                tbl_purchase.totalAmount,
+                tbl_party.partyName,
+                tbl_party.partyAddress
+            FROM
+                tbl_paymentvoucher
+                left join tbl_purchase ON tbl_paymentvoucher.tbl_purchaseId = tbl_purchase.id
+                left join tbl_sales ON tbl_paymentvoucher.tbl_sales_id = tbl_sales.id
+                left join tbl_party ON tbl_paymentvoucher.tbl_partyId = tbl_party.id
+            
+            where tbl_paymentvoucher.deleted = 'No' 
+                AND tbl_paymentvoucher.paymentDate ='$date'
+                AND tbl_paymentvoucher.status= 'Active' 
+                AND tbl_paymentvoucher.paymentMethod = 'Cash' 
+                AND tbl_paymentvoucher.type IN ('payment', 'paymentReceived', 'partyPayable')";
+                //AND tbl_paymentvoucher.type IN ('payment', 'paymentReceived', 'partyPayable')";
 
 
 $result = $conn->query($sql);
@@ -183,34 +182,36 @@ $button = '';
 $data = '';
 $cashIn = 0;
 $cashOut = 0;
-$balance = 0;;
+$balance = 0;
+$amount =0;
 while ($row = $result->fetch_array()) {
 
     if ($row['type'] == "payment") {
-        $cashOut +=$row['totalAmount'];
-        $balance -= $row['totalAmount'] ;
+        $cashOut +=  $row['amount'] ;
+        $balance -= $row['amount'] ;
         $content .= '<tr>
-                    <td class="text-center">' . $i++ . '</td>' .
+             <td class="text-center">' . $i++ . '</td>' .
             '<td class="text-left">' . $row['remarks'] . '<br>' . $row['partyName']  . ' | ' .$row['partyAddress']  . '</td>' .
             '<td class="text-center">'.  $row['voucherNo'] . '</td>' .
             '<td class="text-center">' . $row['grandTotal']  . '</td>' .
-            '<td></td>' .
-            '<td class="textRight">' .$row['totalAmount'] . '</td>' .
+            '<td class="textRight">  -  </td>' .
+            '<td>' . $cashOut . '</td>' .
             '<td class="textRight">' . number_format($balance) . '</td>' .
             '</tr>';
-    } else if ($row['type'] == "paymentReceive") {
-        $cashIn += $row['totalAmount'] ;
-        $balance += $row['totalAmount'] ;
+    } else if ($row['type'] == "paymentReceived") {
+        $cashIn +=  $row['amount'];
+        $balance += $row['amount'] ;
         $content .= '<tr>
-                    <td class="text-center">' . $i++ . '</td>' .
+                <td class="text-center">' . $i++ . '</td>' .
             '<td class="text-left">' . $row['remarks']. '<br>' . $row['partyName'] . ' | ' . $row['partyAddress']  . '</td>' .
             '<td class="text-center">' . $row['voucherNo'] . '</td>' .
-            '<td class="text-center">' . $row['paidAmount']  . '</td>' .
-            '<td class="textRight">' .$row['totalAmount'] . '</td>' .
-            '<td></td>' .
+            '<td class="text-center">' . $row['grandTotal']  . '</td>' .
+            '<td>' . $cashIn . '</td>' .
+            '<td class="textRight">  -  </td>' .
             '<td class="textRight">' . number_format($balance) . '</td>' .
             '</tr>';
-    } else {
+    } 
+/*     else {
         $content .= '<tr>
                     <td class="text-center">' . $i++ . '</td>' .
             '<td class="text-left">' .$row['remarks']  . '<br>' .$row['partyName'] . ' | ' . $row['partyAddress']  . '</td>' .
@@ -220,45 +221,18 @@ while ($row = $result->fetch_array()) {
             '<td></td>' .
             '<td class="textRight"></td>' .
             '</tr>';
-    }
+    } */
 
 
 } //End while 
 $button .= '';
-			$content .= '
-			<tr><td></td><td></td><td></td><td></td><td></td><td></td><td class="citiestd11" >Total = </td><td class="citiestd11">'.number_format( $balance ,2).'</td></tr>
-		</table><br><br>
+$content .= '
+	<tr><td></td><td></td><td></td><td></td><td></td><td class="citiestd11" >Total = </td><td class="citiestd11">'.number_format( $balance ,2).'</td></tr>
+	</tbody>
+    </table><br><br>
 		';
 			
-			$content .='
-				<!--<table>
-					<tr><br>
-						<td width="60%"> </td>
-						<td width="30%">Delivery Weapons : </td>
-					</tr>
-					<tr>
-						<td width="71%"></td>
-						<td width="30%">Bullets : </td>
-					</tr>
-					<tr>
-						<td width="61.4%"></td>
-						<td width="35%">Return Weapons : </td>
-					</tr>
-					<tr>
-						<td width="71%"></td>
-						<td width="35%">Bullets : </td>
-					</tr>
-					<tr>
-						<td width="58.5%"></td>
-						<td width="25%">Total Weapons Use : </td>
-					</tr>
-					<tr>
-						<td width="61%"></td>
-						<td width="25%">Total Bullets Use : </td>
-					</tr>
-					
-				</table-->
-			';
+		
 		
 	$pdf->writeHTML($content);  
     ob_end_clean();

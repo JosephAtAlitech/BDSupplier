@@ -122,7 +122,7 @@ setInputDate("#startDate");
                                         <th width="4%">SL</th>
                                         <th width="25%">Particulars</th>
                                         <th width="15%">Voucher</th>
-                                        <th width="15%">Grand Total</th>
+                                        <th width="15%">Grand       Total</th>
                                         <th width="15%">Cash In</th>
                                         <th width="15%">Cash Out</th>
                                         <th width="15%">Balance</th> 

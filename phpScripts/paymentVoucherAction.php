@@ -3,7 +3,7 @@ $conPrefix = '../';
 include $conPrefix . 'includes/session.php';
 
 date_default_timezone_set('Asia/Dhaka');
-$toDay = (new DateTime($test))->format("Y-m-d H:i:s");
+$toDay = (new DateTime())->format("Y-m-d H:i:s");
 
 if(isset($_POST['action'])){
     if($_POST['action'] == "loadParty"){
@@ -287,6 +287,37 @@ if(isset($_POST['action'])){
         $sql = "INSERT INTO tbl_paymentVoucher(tbl_partyId, amount, entryBy, paymentMethod, chequeNo, paymentDate, chequeIssueDate, type, remarks, tbl_bankInfoId, voucherType, voucherNo, customerType, chequeBank,entryDate, voucher_book) 
                 VALUES ('$partyName','$amount','$loginID','$paymentMethod','$chequeNumber','$voucherDate','$transitDate','$getVoucherType','Voucher Entry for party transaction $remarks','$accountNo','$voucherType','$voucherNo', '$customerType', '$chequeBank','$toDay', '$book')";
         if($conn->query($sql)){
+            //Update Current Balance
+            if($conn->query($sql)){
+                if(  $getVoucherType =="paymentReceived"){
+                    if($paymentMethod =="CHEQUE" || $paymentMethod =="EFT"){
+                        $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $amount WHERE methodName = '$paymentMethod'";
+                        $conn->query($sql2);
+
+                        $sql2="UPDATE `tbl_bank_account_info` SET current_balance = current_balance + $amount WHERE id = '$accountNo'";
+                        $conn->query($sql2);
+                    }else{
+                        $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $amount WHERE methodName = '$paymentMethod'";
+                        $conn->query($sql2);
+                    }
+                   
+                }
+                else if($getVoucherType ="payment"){
+                    
+                    if($paymentMethod =="CHEQUE" || $paymentMethod =="EFT"){
+                        $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $amount WHERE methodName = '$paymentMethod'";
+                        $conn->query($sql2);
+
+                        $sql2="UPDATE `tbl_bank_account_info` SET current_balance = current_balance - $amount WHERE id = '$accountNo'";
+                        $conn->query($sql2);
+                    }else{
+                        $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $amount WHERE methodName = '$paymentMethod'";
+                        $conn->query($sql2);
+                    }
+             
+                }
+              
+            }
             echo json_encode('Success');
         }else{
             echo json_encode('Error: '.$conn->error);
@@ -414,10 +445,45 @@ if(isset($_POST['action'])){
     else if($_POST['action'] == "deleteVoucher"){
         $loginID = $_SESSION['user'];
         $id = $_POST['id'];
+
+        $sql = "SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.amount, tbl_paymentVoucher.type, tbl_paymentVoucher.tbl_bankInfoId, tbl_paymentVoucher.paymentMethod
+                FROM tbl_paymentVoucher where id ='$id'";
+        $result =   $conn->query($sql);
+        $row= $result->fetch_assoc();
+        $amount = $row['amount'];
+        $method = $row['paymentMethod'];
+        $getVoucherType = $row['type'];
+        $accountNo = $row['tbl_bankInfoId'];
+
         $sql = "UPDATE tbl_paymentVoucher 
                 SET deleted = 'Yes', deletedBy='$loginID', deletedDate='$toDay'
                 WHERE id='$id'";
         if($conn->query($sql)){
+            //Update Current balance after deletion
+            if($getVoucherType =="paymentReceived"){
+                if($method =="CHEQUE" || $method =="EFT"){
+                    $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $amount WHERE methodName = '$method'";
+                    $conn->query($sql2);
+
+                    $sql2="UPDATE `tbl_bank_account_info` SET current_balance = current_balance - $amount WHERE id = '$accountNo'";
+                    $conn->query($sql2);
+                }else{
+                    $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $amount WHERE methodName = '$method'";
+                    $conn->query($sql2);
+                } 
+            }
+            else if($getVoucherType ="payment"){
+                if($method =="CHEQUE" || $method =="EFT"){
+                    $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $amount WHERE methodName = '$method'";
+                    $conn->query($sql2);
+
+                    $sql2="UPDATE `tbl_bank_account_info` SET current_balance = current_balance + $amount WHERE id = '$accountNo'";
+                    $conn->query($sql2);
+                }else{
+                    $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $amount WHERE methodName = '$method'";
+                    $conn->query($sql2);
+                }
+            }
             echo json_encode('Success');
         }else{
             echo json_encode('Error: '.$conn->error.$sql);
@@ -428,7 +494,7 @@ if(isset($_POST['action'])){
     $getVoucherType = $_GET['voucherType'];
     if($getVoucherType == 'paymentReceived'){
         if($_GET['sortData'] == "0,0"){
-            $sql = "SELECT tbl_paymentVoucher.id ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+            $sql = "SELECT tbl_paymentVoucher.id , tbl_paymentVoucher.status,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName,  tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName,tbl_walkin_customer.customerName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
                     LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
@@ -437,7 +503,7 @@ if(isset($_POST['action'])){
                     ORDER BY id DESC";
         } else {
             $dates = explode(",",$_GET['sortData']);
-            $sql = "SELECT tbl_paymentVoucher.id ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+            $sql = "SELECT tbl_paymentVoucher.id , tbl_paymentVoucher.status,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName,  tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo,tbl_walkin_customer.customerName, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
                     LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
@@ -447,7 +513,7 @@ if(isset($_POST['action'])){
         }
     }else if($getVoucherType == 'payment'){
         if($_GET['sortData'] == "0,0"){
-            $sql = "SELECT tbl_paymentVoucher.id ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName,  tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+            $sql = "SELECT tbl_paymentVoucher.id , tbl_paymentVoucher.status, tbl_paymentVoucher.tbl_partyId, tbl_party.partyName,  tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON tbl_paymentVoucher.tbl_partyId = tbl_party.id and tbl_paymentVoucher.customerType='Party'
                     LEFT OUTER JOIN tbl_bank_account_info ON tbl_paymentVoucher.tbl_bankInfoId = tbl_bank_account_info.id
@@ -455,7 +521,7 @@ if(isset($_POST['action'])){
                     ORDER BY id DESC";
         } else {
         	$dates = explode(",",$_GET['sortData']);
-        	$sql = "SELECT tbl_paymentVoucher.id ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName,  tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+        	$sql = "SELECT tbl_paymentVoucher.id,  tbl_paymentVoucher.status,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName,  tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON tbl_paymentVoucher.tbl_partyId = tbl_party.id and tbl_paymentVoucher.customerType='Party'
                     LEFT OUTER JOIN tbl_bank_account_info ON tbl_paymentVoucher.tbl_bankInfoId = tbl_bank_account_info.id
@@ -464,16 +530,16 @@ if(isset($_POST['action'])){
         }
     }else if($getVoucherType == "adjustment"){
         if($_GET['sortData'] == "0,0"){
-            $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
-                FROM tbl_paymentVoucher
-                LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
-                LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
-                LEFT OUTER JOIN tbl_bank_account_info ON tbl_paymentVoucher.tbl_bankInfoId = tbl_bank_account_info.id
-                WHERE tbl_paymentVoucher.status='Active' AND (tbl_paymentVoucher.voucherType='SalesReturn' || tbl_paymentVoucher.voucherType='PurchaseReturn') AND tbl_paymentVoucher.deleted='No' AND (tbl_paymentVoucher.type = 'payable' OR tbl_paymentVoucher.type = 'partyPayable' OR tbl_paymentVoucher.type = 'adjustment' OR tbl_paymentVoucher.type = 'paymentAdjustment')
-                ORDER BY id DESC";
+            $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type,  tbl_paymentVoucher.status ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+                    FROM tbl_paymentVoucher
+                    LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
+                    LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
+                    LEFT OUTER JOIN tbl_bank_account_info ON tbl_paymentVoucher.tbl_bankInfoId = tbl_bank_account_info.id
+                    WHERE tbl_paymentVoucher.status='Active' AND (tbl_paymentVoucher.voucherType='SalesReturn' || tbl_paymentVoucher.voucherType='PurchaseReturn') AND tbl_paymentVoucher.deleted='No' AND (tbl_paymentVoucher.type = 'payable' OR tbl_paymentVoucher.type = 'partyPayable' OR tbl_paymentVoucher.type = 'adjustment' OR tbl_paymentVoucher.type = 'paymentAdjustment')
+                    ORDER BY id DESC";
         } else {
         	$dates = explode(",",$_GET['sortData']);
-            $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+            $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type,  tbl_paymentVoucher.status ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
                     LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
@@ -483,7 +549,7 @@ if(isset($_POST['action'])){
         }
     }else if ($getVoucherType == "discount"){
         if($_GET['sortData'] == "0,0"){
-                $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+                $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type,  tbl_paymentVoucher.status ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
                     LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
@@ -492,7 +558,7 @@ if(isset($_POST['action'])){
                     ORDER BY id DESC";
         } else {
         	$dates = explode(",",$_GET['sortData']);
-            $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
+            $sql ="SELECT tbl_paymentVoucher.id,tbl_paymentVoucher.type,  tbl_paymentVoucher.status ,tbl_paymentVoucher.tbl_partyId, tbl_party.partyName, tbl_walkin_customer.customerName, tbl_paymentVoucher.amount, tbl_paymentVoucher.paymentMethod, tbl_paymentVoucher.paymentDate, tbl_paymentVoucher.remarks, tbl_paymentVoucher.voucherType, tbl_paymentVoucher.chequeIssueDate, tbl_paymentVoucher.chequeNo, tbl_bank_account_info.accountNo, tbl_bank_account_info.accountName, tbl_bank_account_info.bankName, tbl_paymentVoucher.tbl_purchaseId, tbl_paymentVoucher.tbl_sales_id, tbl_sales_return_id, tbl_purchase_return_id, tbl_paymentVoucher.voucher_book
                     FROM tbl_paymentVoucher
                     LEFT OUTER JOIN tbl_party ON (tbl_paymentVoucher.tbl_partyId = tbl_party.id AND tbl_paymentVoucher.customerType = 'Party')
                     LEFT OUTER JOIN tbl_walkin_customer ON (tbl_paymentVoucher.tbl_partyId = tbl_walkin_customer.id AND tbl_paymentVoucher.customerType = 'WalkinCustomer')
@@ -532,21 +598,21 @@ if(isset($_POST['action'])){
     						<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
     						<i class="fa fa-gear tiny-icon"></i>  <span class="caret"></span></button>
     						<ul class="dropdown-menu dropdown-menu-right" style="border: 1px solid gray;" role="menu">
-    							<li><a href="viewPaymentVoucher.php?id='.$row['id'].'&vtype='.$getVoucherType.'" target="_blank"><i class="fa fa-print tiny-icon"></i>View Voucher</a></li>';
+    						<li><a href="viewPaymentVoucher.php?id='.$row['id'].'&vtype='.$getVoucherType.'" target="_blank"><i class="fa fa-print tiny-icon"></i>View Voucher</a></li>';
     		if($row['tbl_sales_id'] == '0' && $row['tbl_purchaseId'] == '0' && $row['tbl_purchase_return_id'] == '0' && $row['tbl_sales_return_id'] == '0' && strtolower($_SESSION['userType']) == 'super admin' || strtolower($_SESSION['userType']) == 'admin support plus'){
-    		    $button .=  '<li><a href="#" onclick="deleteVoucher('.$paymentVoucherId.')"><i class="fa fa-trash tiny-icon"></i>Delete</a></li>';
+    		    $button .= '<li><a href="#" onclick="deleteVoucher('.$paymentVoucherId.')"><i class="fa fa-trash tiny-icon"></i>Delete</a></li>';
     		}
     		$button .= '</ul>
 		            </div>';
             $output['data'][] = array(
-                $i++,
-                $row['paymentDate'],
-                $row['partyName'].''.$row['customerName'].'<br>'.$row['voucher_book'],
-                $row['paymentMethod'],
-                $row['amount'],
-                $row['chequeIssueDate'].' - '.$row['chequeNo'],
-                $row['remarks'],
-                $button
+                        $i++,
+                        $row['paymentDate'],
+                        $partyName.'<br>'.$row['voucher_book'],
+                        $row['paymentMethod'],
+                        $row['amount'],
+                        $row['chequeIssueDate'].' - '.$row['chequeNo'],
+                        $row['remarks'],
+                        $button
             );
         } // /while 
     }// if num_rows

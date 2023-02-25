@@ -565,8 +565,6 @@
 			  var edit_locationAreaBangla=$("#edit_locationAreaBangla").val();
 			  var edit_partyAddressBangla=$("#edit_partyAddressBangla").val();
 			  
-			 
-			
 			var fd = new FormData();
 			fd.append('TblUid',tblUid);
 			fd.append('edit_partyNameBangla',edit_partyNameBangla);

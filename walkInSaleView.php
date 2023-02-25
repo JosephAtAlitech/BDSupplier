@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-xs-6">
                     <div id="customer_div"><select id="customers" name="customers"></select></div>
-				</div>
+				        </div>
 				<div class="col-xs-3">
 					<div id='divMsg' class='alert alert-success alert-dismissible successMessage'></div>
 					<div id='divErrorMsg' class='alert alert-danger alert-dismissible errorMessage'></div>

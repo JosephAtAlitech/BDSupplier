@@ -61,24 +61,33 @@ if(isset($_POST['saveCheque'])) {
     		}
     	}
 
-        try{    
+        try{ 
+            $sql = "SELECT id 
+                    FROM tbl_cheque
+                    WHERE cheque_no='$chequeNo'
+                    AND deleted='No'";
+            $result = $conn->query($sql);
+            if($result->num_rows == 0){   
             $conn->begin_transaction();
             $sql = " INSERT INTO tbl_cheque ( cheque_receiving_date, tbl_party_id, party_type, voucher_type, tbl_bank_id, tbl_branch_id, cheque_type, pay_to, tbl_bank_account_id, cheque_no, cheque_date, amount, status, cheque_image, created_by, created_date, deleted )
-             VALUES ( '$chequeReceivingDate', '$partyId', '$partyType', '$voucherType', '$bankId', '$branchId','$chequeType', '$payTo', '$depositeAccount', '$chequeNo', '$chequeDate' , '$amount', 'Pending','$path', '$loginID', '$toDay', 'No' ) ";
+                     VALUES ( '$chequeReceivingDate', '$partyId', '$partyType', '$voucherType', '$bankId', '$branchId','$chequeType', '$payTo', '$depositeAccount', '$chequeNo', '$chequeDate' , '$amount', 'Pending','$path', '$loginID', '$toDay', 'No' ) ";
             
-			if ($conn->query($sql)) {
-    		   
-    			$conn->commit();
-    			echo json_encode('Success');
-            } else {
-                echo json_encode($conn->error);
+                if ($conn->query($sql)) {
+                   
+                
+                    $conn->commit();
+                    echo json_encode('Success');
+                } else {
+                    echo json_encode($conn->error);
+                }
+            }else{
+                echo json_encode("This cheque No is already exists");
             }
-    		
         }catch(Exception $e){
     		$conn->rollBack();
     		echo 'RollBack';
-    	}
-        $conn->close();
+    }
+    $conn->close();
  
     }     // Delete Exp Cheque
     elseif (isset($_POST['action_delete'])== "deleteCheque") {
@@ -98,6 +107,7 @@ if(isset($_POST['saveCheque'])) {
         $bankAccountId = $_POST['bankAccountId'];
         $amount = $_POST['amount'];
         $status = $_POST['chequeStatus'];
+        $chequeType = $_POST['chequeType'];
         
         if($status == "Completed"){
             $sql = "UPDATE tbl_cheque_placement SET deleted='Yes', deleted_date='$toDay', deleted_by='$loginID' WHERE id = '$id' ";
@@ -106,13 +116,25 @@ if(isset($_POST['saveCheque'])) {
                 if ($conn->query($sql2)){ 
                     $sql3 = "UPDATE tbl_paymentvoucher SET deleted='Yes', deletedDate='$toDay', deletedBy='$loginID' WHERE chequeNo = '$chequeNo' ";
                     if ($conn->query($sql3)){ 
-                        $sqlBank ="UPDATE tbl_bank_account_info SET current_balance = current_balance - $amount WHERE id = $bankAccountId";
+                        if($chequeType ="Cash Cheque"){
+                            $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance - $amount WHERE methodName = 'CHEQUE'";
+                            
+                            if($conn->query($sql2)){
+                                $conn->commit();
+                                echo json_encode('Success');
+                            }else{
+                                echo json_encode('Error: '.$conn->error);
+                            }
+                        }else{
+                            $sqlBank ="UPDATE tbl_bank_account_info SET current_balance = current_balance - $amount WHERE id = $bankAccountId";
                         
-                        if($conn->query($sqlBank)){
-                           echo json_encode('Success');
-                        }else {
-                           json_encode($conn->error);  
+                            if($conn->query($sqlBank)){
+                               echo json_encode('Success');
+                            }else {
+                               json_encode($conn->error);  
+                            }
                         }
+                      
                     }else {
                         json_encode($conn->error);  
                     }
@@ -163,7 +185,7 @@ if(isset($_POST['saveCheque'])) {
             
     } elseif (isset($_POST['loadParty'])== "loadParty") {
         $type = $_POST['partyType'];
-       
+        $row=[];
         $sql = "SELECT id ,partyName FROM `tbl_party` WHERE status='Active' AND tblType='$type' ORDER BY `id`  DESC";
         $query = $conn->query($sql);
         //$datadd = mysqli_fetch_assoc($query);
@@ -199,6 +221,7 @@ if(isset($_POST['saveCheque'])) {
         }
         
         try{    
+            
             $conn->begin_transaction();
             $sql = " INSERT INTO tbl_cheque_placement ( tbl_cheque_id, placement_date, cheque_status, remarks, clearance_date, created_by, created_date)
                     VALUES ( '$chequeId', '$placementDate', '$chequeStatus','$remarks', '$bounceAndClearanceDate', '$loginID', '$toDay') ";
@@ -223,14 +246,27 @@ if(isset($_POST['saveCheque'])) {
                                     VALUES ('$partyId','$amount','$loginID','Cheque','$chequeNo','$bounceAndClearanceDate','$chequeDate','paymentReceived','$remarks','$voucherNo','$chequeVoucherType', '$partyType', '$bankName','$toDay')";
                             
                             if($conn->query($sqlVoucher)){
-                                $sqlBank ="UPDATE tbl_bank_account_info SET current_balance = current_balance + $amount WHERE id = $bankAccountId";
-                                
-                                if($conn->query($sqlBank)){
-                                    $conn->commit();
-                                    echo json_encode('Success');
-                                }else{
-                                    echo json_encode('Error: '.$conn->error);
+                                if($chequeType ="Cash Cheque"){
+                                    $sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $amount WHERE methodName = 'CHEQUE'";
+                                    
+                                    if($conn->query($sql2)){
+                                        $conn->commit();
+                                        echo json_encode('Success');
+                                    }else{
+                                        echo json_encode('Error: '.$conn->error);
+                                    }
                                 }
+                                else{
+                                    $sqlBank ="UPDATE tbl_bank_account_info SET current_balance = current_balance + $amount WHERE id = $bankAccountId";
+                                
+                                    if($conn->query($sqlBank)){
+                                        $conn->commit();
+                                        echo json_encode('Success');
+                                    }else{
+                                        echo json_encode('Error: '.$conn->error);
+                                    }
+                                }
+                              
                             }else{
                                 echo json_encode('Error: '.$conn->error);
                             }
@@ -257,7 +293,7 @@ if(isset($_POST['saveCheque'])) {
     elseif(isset($_POST['chequePlacementData']) == "chequePlacementData"){
         $chequeId= $_POST['chequeId'];
      
-        $sql = "SELECT tbl_cheque_placement.*, tbl_cheque.cheque_no, tbl_cheque.amount, tbl_cheque.tbl_bank_account_id FROM tbl_cheque_placement  
+        $sql = "SELECT tbl_cheque_placement.*, tbl_cheque.cheque_no, tbl_cheque.amount,tbl_cheque.cheque_type, tbl_cheque.tbl_bank_account_id FROM tbl_cheque_placement  
                 join tbl_cheque on tbl_cheque_placement.tbl_cheque_id =tbl_cheque.id
                 WHERE tbl_cheque_id = $chequeId AND tbl_cheque_placement.deleted ='No' ORDER BY created_date DESC";
 		$results = $conn->query($sql);	
@@ -270,40 +306,59 @@ if(isset($_POST['saveCheque'])) {
     }
 
 else{
-       // echo $_GET('type');
         /* Display Data from Cheque table */
-if($_GET['type']== 'Bounced'){
-    $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
-    INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
-    INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
-    WHERE tbl_cheque.deleted='No' AND tbl_cheque.status='Bounce' order by tbl_cheque.id DESC";
-}else if($_GET['type']== 'Unsettled'){
+if(isset($_GET['filter'])){
+    $filter = explode("@",$_GET['filter']);
 
-    $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
-    INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
-    INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
-    WHERE tbl_cheque.deleted='No' AND tbl_cheque.status!='Pending' AND  tbl_cheque.status!='Completed' AND  tbl_cheque.status!='Decline'   order by tbl_cheque.id DESC";
-}
-else if($_GET['type']== 'Unplaced'){
+if($filter[0] == 'Status'){
+    $filter  = $filter[1];
+    if( $filter== 'Bounced'){
+        $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
+        INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
+        INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
+        WHERE tbl_cheque.deleted='No' AND tbl_cheque.status='Bounce' order by tbl_cheque.id DESC";
+    }else if($filter == 'Unsettled'){
+    
+        $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
+        INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
+        INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
+        WHERE tbl_cheque.deleted='No' AND tbl_cheque.status!='Pending' AND  tbl_cheque.status!='Completed' AND  tbl_cheque.status!='Decline'   order by tbl_cheque.id DESC";
+    }
+    else if($filter == 'Unplaced'){
+    
+        $effectiveDate = date('Y-m-d', strtotime("-5 months", strtotime($toDay)));
+        $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
+        INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
+        INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
+        WHERE tbl_cheque.deleted='No' AND tbl_cheque.status='Pending' AND tbl_cheque.cheque_date<='$effectiveDate'  order by tbl_cheque.id DESC";
+    }else if($filter == 'nextPlacement'){
+    
+        $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name  FROM `tbl_cheque`  
+        INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
+        INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
+        WHERE tbl_cheque.deleted='No'  AND `cheque_date` BETWEEN NOW() AND (SELECT date FROM `calender_tbl` WHERE date > now() AND day_type='Onday'  ORDER BY date ASC LIMIT 1)";
+    }
+    
+}else{
+    if($filter[0] == 'Date'){
+        $filterDate = explode(",", $filter[1]);
+        if($filterDate[0] == "0" ){
+            $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
+            INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
+            INNER  JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
+            WHERE tbl_cheque.deleted='No' order by tbl_cheque.id DESC";
+        }else{
+            $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name  FROM `tbl_cheque`  
+            INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
+            INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
+            WHERE tbl_cheque.deleted='No'  AND `cheque_date` BETWEEN '$filterDate[0]' AND '$filterDate[1]'";
+        }
+       
 
-    $effectiveDate = date('Y-m-d', strtotime("-5 months", strtotime($toDay)));
-    $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
-    INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
-    INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
-    WHERE tbl_cheque.deleted='No' AND tbl_cheque.status='Pending' AND tbl_cheque.cheque_date<='$effectiveDate'  order by tbl_cheque.id DESC";
-}else if($_GET['type']== 'nextPlacement'){
-    $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name  FROM `tbl_cheque`  
-    INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
-    INNER JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
-    WHERE tbl_cheque.deleted='No'  AND `cheque_date` BETWEEN NOW() AND (SELECT date FROM `calender_tbl` WHERE date > now() AND day_type='Onday' AND day_type='Offday' ORDER BY date ASC LIMIT 1)";
+    }
 }
-else{    
-    $sql = "SELECT tbl_cheque.* , tbl_party.partyName, tbl_party.partyAddress,tbl_party.tblCountry,tbl_party.partyPhone, tbl_bank.bank_name FROM `tbl_cheque`  
-    INNER JOIN tbl_bank on tbl_cheque.tbl_bank_id = tbl_bank.id
-    INNER  JOIN tbl_party on tbl_cheque.tbl_party_id = tbl_party.id
-    WHERE tbl_cheque.deleted='No' order by tbl_cheque.id DESC";
-}
-		
+
+
 		$result = $conn->query($sql);
 		$i = 1;
 		$output = array('data' => array());
@@ -344,7 +399,7 @@ else{
 				$status = "<label class='label label-success'>" . $row['status'] . "</label>";
 			}
             elseif ($row['status'] == 'Decline')  {
-				// Completed status
+				// Decline status
 				$status = "<label class='label label-danger'>" . $row['status'] . "</label>";
 			}
            
@@ -352,6 +407,7 @@ else{
             $sql2= "SELECT placement_date,clearance_date FROM `tbl_cheque_placement` WHERE tbl_cheque_id='$id' order by id DESC limit 1";
             $req= $conn->query($sql2);
             $rowData= $req->fetch_assoc();
+
             if($rowData['placement_date']){
                 $placementDate ='<strong>Placement Date:</strong>'.$rowData['placement_date'].'<br><strong>Clearence Date:</strong>  '.$rowData['clearance_date'] ;
             }else{
@@ -370,6 +426,7 @@ else{
 			);
 		} //End while 
 		echo json_encode($output);
+    }
 }
 
 ?>

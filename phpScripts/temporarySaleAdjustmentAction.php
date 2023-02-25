@@ -175,6 +175,11 @@ if (isset($_POST["action"])) {
 						$sql = "INSERT INTO tbl_paymentVoucher (tbl_partyId, tbl_sales_id, amount, entryBy, paymentMethod, paymentDate, status, remarks, type, voucherType, voucherNo, customerType,entryDate) 
     							VALUES ('$customers', '$salesId', '$paidAmount', '$loginID', '$paymentMethod', '$salesDate', 'Active', 'payment for Temporary Sales Code: $salesOrderNo', 'paymentReceived', 'TS', '$voucherReceiveNo', '$customerType','$toDay')";
 						$conn->query($sql);
+							//Add current balance
+							if($conn->query($sql)){
+								$sql2="UPDATE `tbl_paymentmethod` SET current_balance = current_balance + $paidAmount WHERE methodName = 'CASH' ";
+								$conn->query($sql2);
+							}
 					}
 				}
 			}

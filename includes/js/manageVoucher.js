@@ -1,5 +1,6 @@
-var managePaymentVoucherTable
+var managePaymentVoucherTable;
 $(document).ready(function() {
+   
 	managePaymentVoucherTable = $("#managePaymentVoucherTable").DataTable({
 		'ajax': 'phpScripts/paymentVoucherAction.php?voucherType='+$("#voucherType").val()+'&sortData='+$("#sortData").val(),
 		'order': [],
@@ -12,52 +13,57 @@ $(document).ready(function() {
       },
       processing: true
 	});
-	$( "#sortData" ).change(function() {
-        manageSalesTable.ajax.url('phpScripts/paymentVoucherAction.php?voucherType='+$("#voucherType").val()+'&sortData='+$("#sortData").val()).load();
-    }); 
-	$("#paymentMethod").select2( {
-		placeholder: "Select Payment Method",
-		allowClear: true
-	} );
-	$("#partyName").select2({
-		placeholder: "Select Party",
-		allowClear: true
-	});
-	$("#accountNo").select2({
-		placeholder: "Select Account Number",
-		allowClear: true
-	});
-	$("#chequeBank").select2({
-		placeholder: "Select Account Number",
-		allowClear: true
-	});
-	//alert($("#voucherType").val());
-	if($("#voucherType").val() == "payment"){
-	    $(".divVoucherTypePR").hide();
-	    $(".divVoucherTypeADJ").hide();
-	    $(".divVoucherTypeP").show();
-	    $("#localPurchase").prop("checked",true);
-	    loadParty("Local Purchase");
-	}else if($("#voucherType").val() == "paymentReceived"){
-	    $(".divVoucherTypeP").hide();
-	    $(".divVoucherTypeADJ").hide();
-	    $(".divVoucherTypePR").show();
-	    $("#PartySale").prop("checked",true);
-	    loadParty("PartySale");
-	}else if($("#voucherType").val() == "discount"){
-	    $(".divVoucherTypeP").hide();
-	    $(".divVoucherTypeADJ").hide();
-	    $(".divVoucherTypePRD").show();
-	    $("#PartySaleD").prop("checked",true);
-	    loadParty("PartySale");
-	}else if($("#voucherType").val() == "adjustment"){
-	    $(".divVoucherTypePR").hide();
-	    $(".divVoucherTypeP").hide();
-	    $(".divVoucherTypeADJ").show();
-	    $("#adjustment").prop("checked",true);
-	    loadParty("adjustment");
-	}
+    
+$( "#sortData" ).change(function() {
+    manageSalesTable.ajax.url('phpScripts/paymentVoucherAction.php?voucherType='+$("#voucherType").val()+'&sortData='+$("#sortData").val()).load();
+}); 
+$("#paymentMethod").select2( {
+    placeholder: "Select Payment Method",
+    allowClear: true
+} );
+$("#partyName").select2({
+    placeholder: "Select Party",
+    allowClear: true
 });
+$("#accountNo").select2({
+    placeholder: "Select Account Number",
+    allowClear: true
+});
+$("#chequeBank").select2({
+    placeholder: "Select Account Number",
+    allowClear: true
+});
+//alert($("#voucherType").val());
+if($("#voucherType").val() == "payment"){
+    $(".divVoucherTypePR").hide();
+    $(".divVoucherTypeADJ").hide();
+    $(".divVoucherTypeP").show();
+    $("#localPurchase").prop("checked",true);
+    loadParty("Local Purchase");
+}else if($("#voucherType").val() == "paymentReceived"){
+    $(".divVoucherTypeP").hide();
+    $(".divVoucherTypeADJ").hide();
+    $(".divVoucherTypePR").show();
+    $("#PartySale").prop("checked",true);
+    loadParty("PartySale");
+}else if($("#voucherType").val() == "discount"){
+    $(".divVoucherTypeP").hide();
+    $(".divVoucherTypeADJ").hide();
+    $(".divVoucherTypePRD").show();
+    $("#PartySaleD").prop("checked",true);
+    loadParty("PartySale");
+}else if($("#voucherType").val() == "adjustment"){
+    $(".divVoucherTypePR").hide();
+    $(".divVoucherTypeP").hide();
+    $(".divVoucherTypeADJ").show();
+    $("#adjustment").prop("checked",true);
+    loadParty("adjustment");
+}
+
+});
+
+
+
 $("#partyName").change(function() {
     if($("#partyName").val() != ""){
         var action = 'loadPartyDue';
@@ -191,6 +197,7 @@ function loadParty(entryVoucherType){
     var entryVoucherType = "";
     if(voucherType == "payment"){
         entryVoucherType = $("input[name='entryVoucherTypeP']:checked").val();
+        alert(entryVoucherType)
     }else if(voucherType == "paymentReceived"){
         entryVoucherType = $("input[name='entryVoucherTypePR']:checked").val();
     }else if(voucherType == "discount"){
